@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<title>HIERRO — Programa KOVA 12 Semanas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-solid:#181614; --surface:#221f1c; --surface-2:#2b2723; --surface-3:#332c22;
+    --brass:#c68a3e; --brass-bright:#e4a94f; --chalk:#ece6d8; --chalk-dim:#a89f8f;
+    --rest:#6f8f6a; --line:#3a352e; --off:#57524a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background: radial-gradient(ellipse at 20% -10%, #2a251f 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 0%, #241f1a 0%, transparent 45%), var(--bg-solid);
+    color:var(--chalk); font-family:'Inter',sans-serif; min-height:100vh;
+    padding:28px 16px 60px; display:flex; justify-content:center;
+  }
+  .app{ width:100%; max-width:980px; }
+  header{ display:flex; align-items:flex-start; justify-content:space-between; border-bottom:1px solid var(--line);
+    padding-bottom:18px; margin-bottom:22px; flex-wrap:wrap; gap:10px; }
+  .logo{ font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:3px; display:flex; align-items:center; gap:10px; }
+  .logo span{ color:var(--brass); }
+  .kb-mark{ width:26px; height:30px; position:relative; display:inline-block; }
+  .kb-mark::before{ content:""; position:absolute; top:0; left:6px; width:14px; height:12px;
+    border:3px solid var(--brass); border-bottom:none; border-radius:14px 14px 0 0; }
+  .kb-mark::after{ content:""; position:absolute; bottom:0; left:2px; width:22px; height:18px;
+    background:var(--brass); border-radius:50%; }
+  .subtitle{ font-family:'Space Mono',monospace; font-size:12px; color:var(--chalk-dim); letter-spacing:1px; text-transform:uppercase; }
+  .streak-badge{ font-family:'Space Mono',monospace; font-size:12px; color:var(--brass-bright); border:1px solid var(--brass); padding:8px 14px; white-space:nowrap; align-self:flex-start; }
+  .done-btn{ width:100%; background:var(--surface-2); border:1px solid var(--rest); color:var(--rest); padding:10px 0; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:.15s ease; }
+  .done-btn:hover{ background:var(--rest); color:#12180f; }
+  .done-btn.done{ background:var(--rest); color:#12180f; font-weight:700; }
+
+  .notice{ background:var(--surface-2); border:1px solid var(--brass); border-left-width:4px;
+    padding:12px 16px; margin-bottom:24px; font-family:'Space Mono',monospace; font-size:11px;
+    color:var(--chalk-dim); line-height:1.6; letter-spacing:.3px; }
+  .notice b{ color:var(--brass-bright); }
+
+  .section-label{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--chalk-dim); margin-bottom:10px; }
+
+  /* Week selector */
+  .week-strip{ display:grid; grid-template-columns:repeat(12,1fr); gap:6px; margin-bottom:22px; }
+  @media (max-width:760px){ .week-strip{ grid-template-columns:repeat(6,1fr); } }
+  .week-btn{ background:var(--surface); border:1px solid var(--line); color:var(--chalk-dim);
+    padding:10px 0; text-align:center; cursor:pointer; font-family:'Bebas Neue',sans-serif; font-size:16px;
+    letter-spacing:.5px; transition:.15s ease; }
+  .week-btn:hover{ border-color:var(--brass); color:var(--chalk); }
+  .week-btn.active{ border-color:var(--brass); background:var(--surface-2); color:var(--brass-bright); }
+
+  /* Day tabs */
+  .day-tabs{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+  .day-tabs.five{ grid-template-columns:repeat(5,1fr); }
+  @media (max-width:760px){ .day-tabs.five{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:600px){ .day-tabs, .day-tabs.five{ grid-template-columns:1fr; } }
+  .day-btn{ background:var(--surface); border:1px solid var(--line); color:var(--chalk-dim);
+    padding:14px; cursor:pointer; text-align:left; position:relative; transition:.15s ease; }
+  .day-btn:hover{ border-color:var(--brass); color:var(--chalk); }
+  .day-btn.active{ border-color:var(--brass); background:var(--surface-2); color:var(--chalk); }
+  .day-btn.active::before{ content:""; position:absolute; top:0; left:0; bottom:0; width:4px; background:var(--brass); }
+  .d-name{ font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; display:block; }
+  .d-meta{ font-family:'Space Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--chalk-dim); margin-top:2px; }
+  .opt-tag{ position:absolute; top:8px; right:8px; font-family:'Space Mono',monospace; font-size:8px; color:var(--brass-bright); border:1px solid var(--brass); padding:2px 5px; text-transform:uppercase; letter-spacing:.5px; }
+
+  /* Blocks: warmup / main / finisher */
+  .block{ background:var(--surface); border:1px solid var(--line); padding:16px 18px; margin-bottom:14px; }
+  .block-title{ font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:1px; color:var(--brass-bright); margin-bottom:4px; }
+  .block-meta{ font-family:'Space Mono',monospace; font-size:10px; color:var(--chalk-dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; }
+  .move-list{ display:flex; flex-direction:column; gap:6px; }
+  .move-item{ display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--surface-2); border:1px solid var(--line); padding:9px 12px; cursor:pointer; transition:.15s ease; }
+  .move-item:hover{ border-color:var(--brass); }
+  .move-item.active{ border-color:var(--brass); background:var(--surface-3); }
+  .move-name{ font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--chalk); display:flex; flex-direction:column; gap:2px; }
+  .move-name em{ font-style:normal; color:var(--brass-bright); font-size:10px; font-weight:700; }
+  .move-tag{ font-family:'Space Mono',monospace; font-size:9px; color:var(--chalk-dim); text-transform:uppercase; letter-spacing:.5px; font-weight:400; }
+  .move-reps{ font-family:'Space Mono',monospace; font-size:10px; color:var(--brass-bright); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
+  .block-note{ font-family:'Space Mono',monospace; font-size:9px; color:var(--chalk-dim); margin-top:10px; line-height:1.5; }
+
+  .weights-table{ width:100%; border-collapse:collapse; font-family:'Space Mono',monospace; font-size:11px; margin-bottom:24px; }
+  .weights-table th, .weights-table td{ border:1px solid var(--line); padding:8px 10px; text-align:left; }
+  .weights-table th{ background:var(--surface-2); color:var(--brass-bright); text-transform:uppercase; font-size:10px; letter-spacing:.5px; }
+  .weights-table td{ color:var(--chalk-dim); }
+  .weights-table td:first-child, .weights-table td:nth-child(2){ color:var(--chalk); }
+
+  .genwarm{ background:var(--surface); border:1px solid var(--line); padding:14px 18px; margin-bottom:22px; }
+  .genwarm-title{ font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:1px; color:var(--brass-bright); margin-bottom:8px; }
+  .genwarm-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px 16px; }
+  @media (max-width:640px){ .genwarm-grid{ grid-template-columns:1fr; } }
+  .genwarm-item{ font-family:'Space Mono',monospace; font-size:10px; color:var(--chalk-dim); display:flex; justify-content:space-between; gap:8px; padding:4px 0; border-bottom:1px dashed var(--line); }
+  .genwarm-item b{ color:var(--chalk); font-weight:600; }
+
+  /* Main panel: viewer + timer */
+  .panel{ background:var(--surface); border:1px solid var(--line); padding:24px;
+    display:grid; grid-template-columns:230px 1fr; gap:28px; margin-top:6px; margin-bottom:26px; }
+  @media (max-width:680px){ .panel{ grid-template-columns:1fr; } }
+  .dial-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .dial{ width:200px; height:200px; position:relative; }
+  .dial svg{ transform:rotate(-90deg); width:100%; height:100%; }
+  .dial-track{ fill:none; stroke:var(--line); stroke-width:8; }
+  .dial-fill{ fill:none; stroke:var(--brass); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
+  .dial-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .dial-time{ font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; letter-spacing:1px; }
+  .dial-phase{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--brass-bright); margin-top:6px; text-align:center; padding:0 8px; }
+  .round-track{ font-family:'Space Mono',monospace; font-size:12px; color:var(--chalk-dim); letter-spacing:1px; text-align:center; }
+  .round-track b{ color:var(--chalk); }
+  .controls{ display:flex; gap:8px; width:100%; }
+  .ctrl-btn{ flex:1; background:var(--surface-2); border:1px solid var(--line); color:var(--chalk); padding:10px 0;
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:.15s ease; }
+  .ctrl-btn:hover{ border-color:var(--brass); }
+  .ctrl-btn.primary{ background:var(--brass); color:#1a1712; border-color:var(--brass); font-weight:700; }
+  .ctrl-btn.primary:hover{ background:var(--brass-bright); }
+
+  .viewer-side{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+  .v-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .v-name{ font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; }
+  .v-tag{ font-family:'Space Mono',monospace; font-size:10px; color:var(--brass-bright); text-transform:uppercase; letter-spacing:1px; }
+  .v-note{ font-family:'Space Mono',monospace; font-size:11px; color:var(--chalk-dim); line-height:1.6; border:1px dashed var(--line); padding:14px; }
+
+  footer{ margin-top:10px; text-align:center; font-family:'Space Mono',monospace; font-size:10px; color:var(--chalk-dim); letter-spacing:1px; line-height:1.7; }
+
+  .gate-overlay{ position:fixed; inset:0; background:var(--bg-solid); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .gate-box{ width:100%; max-width:320px; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; }
+  .gate-logo{ font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:3px; display:flex; align-items:center; gap:10px; }
+  .gate-logo span{ color:var(--brass); }
+  .gate-sub{ font-family:'Space Mono',monospace; font-size:11px; color:var(--chalk-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .gate-input{ width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--chalk); padding:12px 14px; font-family:'Space Mono',monospace; font-size:13px; text-align:center; }
+  .gate-input:focus{ outline:none; border-color:var(--brass); }
+  .gate-btn{ width:100%; }
+  .gate-error{ font-family:'Space Mono',monospace; font-size:11px; color:#c65c3e; min-height:14px; }
+</style>
+</head>
+<body>
+<div id="gateOverlay" class="gate-overlay">
+  <div class="gate-box">
+    <div class="gate-logo"><span class="kb-mark"></span>HIERRO<span>.</span></div>
+    <div class="gate-sub">Acceso privado — programa KOVA</div>
+    <input type="password" id="gatePass" class="gate-input" placeholder="Contraseña" autocomplete="off">
+    <button class="ctrl-btn primary gate-btn" id="gateBtn">Entrar</button>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+<div class="app">
+
+  <header>
+    <div>
+      <div class="logo"><span class="kb-mark"></span>HIERRO<span>.</span></div>
+      <div class="subtitle">Programa KOVA — 12 Semanas · Taxonomía de movimientos de Norman</div>
+    </div>
+    <div id="streakBadge" class="streak-badge">🔥 0 días de racha</div>
+  </header>
+
+  <div class="notice">
+    <b>Sobre este plan:</b> ejercicios, patrones de movimiento, dificultad y errores comunes tomados directamente de la biblioteca de Norman ("Entregable_Norman.xlsx" — 31 movimientos con kettlebell). La estructura de cada día (calentamiento, bloques principales y finalizador) y sus series/descansos son los que Norman definió para la Semana 1; cada semana, dentro de ese mismo esqueleto, el ejercicio que llena cada patrón (bisagra, sentadilla, empuje, tracción, jalón, carga, core, movilidad) rota — así ninguna semana repite exactamente la misma selección. El calentamiento general de abajo (movilidad articular + activación + preparación dinámica) se hace siempre, antes del calentamiento específico del día.
+  </div>
+  <div class="notice" id="blockNotice" style="border-color:var(--line);"></div>
+
+  <div class="section-label">Pesos sugeridos (kg)</div>
+  <table class="weights-table">
+    <thead><tr><th>Nivel</th><th>Género</th><th>Peso sugerido</th><th>Notas</th></tr></thead>
+    <tbody id="weightsBody"></tbody>
+  </table>
+
+  <div class="genwarm">
+    <div class="genwarm-title">Calentamiento general (siempre, antes de empezar)</div>
+    <div class="genwarm-grid" id="genWarmGrid"></div>
+  </div>
+
+  <div class="section-label">Semana del programa</div>
+  <div class="week-strip" id="weekStrip"></div>
+
+  <div class="section-label">Día de entrenamiento</div>
+  <div class="day-tabs" id="dayTabs"></div>
+
+  <div id="blocksContainer"></div>
+
+  <div class="panel" id="panel">
+    <div class="dial-wrap">
+      <div class="dial">
+        <svg viewBox="0 0 200 200">
+          <circle class="dial-track" cx="100" cy="100" r="88"></circle>
+          <circle class="dial-fill" id="dialFill" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="dial-center">
+          <div class="dial-time" id="dialTime">60</div>
+          <div class="dial-phase" id="dialPhase">DESCANSO</div>
+        </div>
+      </div>
+      <div class="round-track" id="roundTrack">Ronda <b>1</b> / 4</div>
+      <div class="controls">
+        <button class="ctrl-btn primary" id="playBtn">Iniciar</button>
+        <button class="ctrl-btn" id="resetBtn">Reiniciar</button>
+      </div>
+      <button class="ctrl-btn done-btn" id="doneBtn">✓ Marcar día completo</button>
+    </div>
+
+    <div class="viewer-side">
+      <div class="v-head">
+        <div class="v-name" id="vName">—</div>
+        <div class="v-tag" id="vTag">—</div>
+      </div>
+      <div class="v-note" id="vNote">Selecciona un ejercicio de la lista para verlo aquí.</div>
+    </div>
+  </div>
+
+  <footer>
+    Toca cualquier ejercicio de la lista para ver sus datos técnicos y cargar su temporizador · El timer usa el descanso/series prescritos para esa sección<br>
+    Metodología y taxonomía de movimientos: Norman (KOVA) — Entregable_Norman.xlsx
+  </footer>
+</div>
+
+<script>
+const GATE_HASH = "d9f714e7795b051ae62a0b5dcdf3a62b0b09e2528d0080a3219aef00ef47d36b";
+const GATE_STORAGE_KEY = "hierro_gate_unlocked";
+async function sha256Hex(str){
+const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function unlockGate(){
+document.getElementById('gateOverlay').style.display = 'none';
+}
+async function attemptUnlock(){
+const val = document.getElementById('gatePass').value;
+const hash = await sha256Hex(val);
+if (hash === GATE_HASH){
+try{ localStorage.setItem(GATE_STORAGE_KEY, '1'); }catch(e){}
+unlockGate();
+} else {
+document.getElementById('gateError').textContent = 'Contraseña incorrecta';
+document.getElementById('gatePass').value = '';
+}
+}
+(function initGate(){
+let already = false;
+try{ already = localStorage.getItem(GATE_STORAGE_KEY) === '1'; }catch(e){}
+if (already){ unlockGate(); }
+document.getElementById('gateBtn').addEventListener('click', attemptUnlock);
+document.getElementById('gatePass').addEventListener('keydown', e=>{ if (e.key === 'Enter') attemptUnlock(); });
+})();
+const EXERCISES = {
+swing_una_mano: { name:"One Arm Swing", patron:"Bisagra", unilateral:"Si", dificultad:3, twoKB:false, desc:"Swing con una sola mano para mayor estabilidad del core", cue:"No Usar La Cadera, Tirar Con El Brazo" },
+goblet_squat: { name:"Kettlebell Globet Squat", patron:"Sentadilla", unilateral:"No", dificultad:4, twoKB:false, desc:"Sentadilla tomando la kettlebell con ambas manos para generar mayor activacion de los musculos de la cadena inferior", cue:"No Poner Los Pies (Apoyos En Los Talones) Al Ancho De Los Hombros Y La Punta De Los Pies Entre 15 Y 30 Grados Mirando Hacia Afuera" },
+bulgarian_squat: { name:"Bulgarian Kettlebell Squat", patron:"Patron De Sentadilla Indiviadual", unilateral:"Si", dificultad:5, twoKB:false, desc:"Tomar la kettlebell con la mano contraria a la pierna de apoyo frontal, generando mayor sobre carga en el apoyo frontal y generando mayor hipertrofia y fuerza articular", cue:"Colocar El Pie O Muy Cerca O Muy Lejos Del Apoyo Posterior, Utilizar Apoyos Posteriores Muy Altos, No Saber Definir La Carga A Trabajar" },
+deadlift_kb: { name:"Kettlebell Deadlift", patron:"Traccion De Bisagra", unilateral:"No", dificultad:3, twoKB:false, desc:"Colocando los pies al ancho de los hombros, manteniendo curvatura lumbar durante todo el recorrido del movimiento, generar una flexion de cadera, a su vez una leve flexion de rodillas, bajar el tronco de manera horizontal a 90 grados", cue:"No Saber Colocar O Mantener La Postura Lumbar, No Saber Controlar La Flexion De Rodillas Durante El Recorrido Del Moviemiento, Desplazar La Kettlebell Hacia Adelante Durante El Descenso Del Movimiento" },
+lunge_estatica: { name:"Kettlebell Static Lunges", patron:"Patron De Sentadilla Individual", unilateral:"Si", dificultad:4, twoKB:false, desc:"Colocar una pierna adelante y otra hacia atras, manteniendo el peso del cuerpo ubicado en ambos segmentos para mayor activacion individual", cue:"Piernas Muy Cerradas O Muy Separadas, Mantener Piernas Demasiado Alineadas, Poco Control De La Carga Externa" },
+lunge_intercalada: { name:"One And One Lunges With Kettlebell", patron:"Patron De Sentadilla Individual", unilateral:"Si", dificultad:3, twoKB:false, desc:"Manteniendo el peso del cuerpo en una sola pierna, desplazar la otra hacia atras, hasta llevar la rodilla a nivel del suelo, sosteniendo la kettlebell con mabas manos he ir cambiando de pierna al volver la pierna de atras al punto incial", cue:"Poco O Pobre Desplazamiento, Inestabilidad En Rodillas, Desplazamientos Muy Largos, Piernas Muy Alineadas" },
+step_up: { name:"Kettlebell Step Up", patron:"Patron De Sentadilla Individual", unilateral:"Si", dificultad:4, twoKB:false, desc:"Con la kettlebell sostenida por ambas manos, subir al cajon apoyando el pie en medio del cajon, e ir intercalando de pierna a medida que se va avanzando en las repeticiones", cue:"Apoyar El Pie Muy En El Bordo O Muy Adelante, Tener Poca Estabilidad Articular De Tobillos Y/O De Rodillas" },
+deadlift_una_pierna: { name:"One Arm Kettlebell Deadlift", patron:"Movilidad", unilateral:"Si", dificultad:3, twoKB:false, desc:"Sostener la kettlebell en la mano contraria al pie que vamos a posicionar en el suelo, generando una flexion de cadera, llevando el cuerpo a una posicion horizontal", cue:"Sostener la kettlebell en la mano contraria al pie que vamos a posicionar en el suelo, generando una flexion de cadera, llevando el cuerpo a una posicion horizontal" },
+swing_dos_manos: { name:"Kettlebell Swing", patron:"Bisagra", unilateral:"No", dificultad:3, twoKB:false, desc:"Sostener la kettlebell a dos manos, empezando el moviemiento con velocidad para generar potencia de cader, flexionando el tronco mientras la kettlebell desciende y flexionando las rodillas, para al momento de de la extension completa de tronco generar una extension de rodillas que permitira una activacion de los cuadriceps, extension de glute al mismo tiempo ny mayor mejora y proteccion lumbar", cue:"Sostener la kettlebell a dos manos, empezando el moviemiento con velocidad para generar potencia de cader, flexionando el tronco mientras la kettlebell desciende y flexionando las rodillas, para al momento de de la" },
+clean: { name:"Kettlebell Clean", patron:"Carga", unilateral:"Si", dificultad:4, twoKB:false, desc:"Llevar la kettlebell en medio de las piernas generando una leve flexion de rodillas y al momento de halar la kettlebel de manera vertical, extender rodillas, mantener el cuerpo erquido, llevando la kettlebell a la altura de los hombros y generar una recpecion de la kettlebell cerca al pecho", cue:"Llevar la kettlebell en medio de las piernas generando una leve flexion de rodillas y al momento de halar la kettlebel de manera vertical, extender rodillas, mantener el cuerpo erquido, llevando la kettlebell a la" },
+snatch: { name:"Kettlebell Snatch", patron:"Jalon", unilateral:"Si", dificultad:5, twoKB:false, desc:"Separa los pies un poco más de los hombros. inclina el torso hacia atrás con la cadera, flexiona las rodillas de forma leve y sujeta la kettlebell con una mano, extiende con mucha fuerza la cadera y las piernas hacia adelante. la fuerza del tronco y de los glúteos hace volar la pesa, no el brazo", cue:"Separa los pies un poco más de los hombros." },
+tiron_alto: { name:"Kettlebell Highpull", patron:"Jalon", unilateral:"No", dificultad:2, twoKB:false, desc:"Separa tus pies un poco más de la distancia de tus hombros. coloca la pesa rusa en el suelo frente a ti, baja la cadera hacia atrás con la espalda recta y toma el asa de la pesa rusa con ambas manos, cuando la pesa suba, flexiona el codo y llévalo hacia atrás y arriba, manteniendo el codo a la altura o ligeramente por debajo del hombro", cue:"Separa tus pies un poco más de la distancia de tus hombros." },
+press: { name:"Kettlebell Press", patron:"Empuje", unilateral:"Ambos", dificultad:2, twoKB:false, desc:"Partiendo del rack (la pesa apoyada en el antebrazo y el pecho), empujas la kettlebell hacia arriba de forma vertical o en un leve arco hasta extender por completo el codo, sin mover los pies ni flexionar las rodillas", cue:"Partiendo del rack (la pesa apoyada en el antebrazo y el pecho), empujas la kettlebell hacia arriba de forma vertical o en un leve arco hasta extender por completo el codo, sin mover los pies ni flexionar las rodillas" },
+push_press: { name:"Kettlebell Push Press", patron:"Empuje", unilateral:"Ambos", dificultad:2, twoKB:false, desc:"Realizas una ligera flexión de rodillas y caderas (dip) y extiendes las piernas de forma explosiva para transferir impulso a la kettlebell, terminando de estirar el brazo con la fuerza de los hombros mientras mantienes los talones apoyados o sin separarlos drásticamente.", cue:"Realizas una ligera flexión de rodillas y caderas (dip) y extiendes las piernas de forma explosiva para transferir impulso a la kettlebell, terminando de estirar el brazo con la fuerza de los hombros mientras mantienes" },
+press_jerk: { name:"Kettlebell Press Jerk", patron:"Empuje", unilateral:"Ambos", dificultad:3, twoKB:false, desc:"Inicia con un dip y un impulso de piernas similar al push press, pero justo cuando la pesa sube, realizas una segunda flexión de rodillas (re-dip o segundo dip) para sumergir rápidamente el cuerpo y \"meterte\" debajo de la carga, bloqueando los brazos antes de ponerte completamente de pie", cue:"Inicia con un dip y un impulso de piernas similar al push press, pero justo cuando la pesa sube, realizas una segunda flexión de rodillas (re-dip o segundo dip) para sumergir rápidamente el cuerpo y \"meterte\" debajo de" },
+remo_una_mano: { name:"Kettlebell Row One Arm", patron:"Traccion", unilateral:"Ambos", dificultad:1, twoKB:false, desc:"La versión a una mano trabaja cada lado del cuerpo por separado y mejora la estabilidad", cue:"La versión a una mano trabaja cada lado del cuerpo por separado y mejora la estabilidad" },
+remo_dos_manos: { name:"Kettlebell Row Both Arms", patron:"Traccion", unilateral:"Ambos", dificultad:2, twoKB:true, desc:"A una mano trabaja cada lado del cuerpo por separado y mejora la estabilidad. la versión a dos manos permite usar más peso y dar fuerza a los dos brazos al mismo tiempo", cue:"A una mano trabaja cada lado del cuerpo por separado y mejora la estabilidad." },
+windmill: { name:"Kettlebell Windmill", patron:"Core", unilateral:"Si", dificultad:5, twoKB:false, desc:"Empuja la cadera hacia el lado del brazo que carga la pesa, mantén la vista fija en la kettlebell. desliza la mano libre por la pierna contraria o baja hacia el suelo de manera controlada, empuja la cadera de regreso a la posición vertical utilizando la fuerza de los glúteos y el abdomen", cue:"Empuja la cadera hacia el lado del brazo que carga la pesa, mantén la vista fija en la kettlebell." },
+turkish_getup: { name:"Turkish Get Up", patron:"Core", unilateral:"Si", dificultad:5, twoKB:false, desc:"Tumbado boca arriba. sostén la kettlebell con una mano con el brazo totalmente estirado hacia el techo. flexiona la pierna del mismo lado del brazo que carga la pesa, deja la otra pierna estirada y abre el brazo libre a unos 45 grados. empuja con el pie flexionado y ruede sobre el cuerpo para apoyar el antebrazo o codo libre en el suelo. mantén la vista fija en la kettlebell, haz fuerza con la mano libre y el talón para elevar el torso y estirar el brazo de apoyo por completo. empuja la cadera hacia arriba con el talón apoyado en el suelo para crear espacio, pasa la pierna estirada por debajo y por detrás de tu cuerpo, apoyando la rodilla en el suelo para formar una línea de apoyo estable. posición de rodillas,  endereza el torso elevando las manos del suelo y ajusta la posición de las piernas para quedar apoyado sobre una rodilla en posición de zancada", cue:"Tumbado boca arriba." },
+halo: { name:"Kettlebell Halo", patron:"Movilidad", unilateral:"No", dificultad:2, twoKB:false, desc:"Sostener la kettlebell por los cuernos a la altura del pecho. levantarla y pasarla alrededor de la cabeza en un movimiento circular y fluido, manteniendo el core contraído y sin mover el torso.", cue:"Mover El Tronco En Lugar De Solo Los Brazos. Usar Una Kettlebell Demasiado Pesada Que Impida La Fluidez." },
+farmer_walk: { name:"Single Arm Farmer's Walk", patron:"Carga", unilateral:"Si", dificultad:2, twoKB:false, desc:"Sostener una kettlebell pesada en una mano como si fuera una maleta. caminar manteniendo la postura erguida, los hombros nivelados y el core apretado para resistir la flexión lateral.", cue:"Inclinarse Hacia El Lado De La Pesa O Hacia El Lado Contrario. Dar Pasos Demasiado Largos O Rápidos." },
+floor_press: { name:"Kettlebell Floor Press", patron:"Empuje", unilateral:"Ambos", dificultad:3, twoKB:false, desc:"Acostado boca arriba con las rodillas flexionadas, sostener la kettlebell con un brazo o ambos. empujar la pesa hacia el techo hasta extender el codo y luego bajar controladamente hasta que el tríceps toque el suelo.", cue:"Rebotar El Codo Contra El Suelo. Perder La Tensión En La Muñeca Dejando Que La Pesa La Doble Hacia Atrás." },
+russian_twist: { name:"Kettlebell Russian Twist", patron:"Core", unilateral:"No", dificultad:3, twoKB:false, desc:"Sentado en el suelo con las rodillas ligeramente flexionadas y los pies elevados. sostener la kettlebell con ambas manos y rotar el torso de lado a lado, llevando la pesa hacia el suelo a cada lado de las caderas.", cue:"Mover Solo Los Brazos Sin Rotar El Torso. Encorvar La Espalda En Exceso." },
+figure_8: { name:"Kettlebell Figure 8", patron:"Bisagra", unilateral:"Ambos", dificultad:3, twoKB:false, desc:"En posición de media sentadilla o bisagra, pasar la kettlebell entre las piernas de una mano a la otra, trazando un ocho alrededor de las piernas. mantener el pecho arriba y la espalda recta.", cue:"Mirar Hacia El Suelo Encorvando La Espalda. Usar Demasiado Los Brazos En Lugar De Estabilizar Con Las Piernas Y El Core." },
+pullover: { name:"Kettlebell Pullover", patron:"Traccion", unilateral:"No", dificultad:3, twoKB:false, desc:"Acostado boca arriba, sostener la kettlebell con ambas manos por los cuernos con los brazos extendidos sobre el pecho. bajar la pesa hacia atrás de la cabeza con los codos ligeramente flexionados y luego volver a la posición inicial.", cue:"Arquear Demasiado La Espalda Baja Al Bajar La Pesa. Flexionar Excesivamente Los Codos Convirtiendo El Movimiento En Una Extensión De Tríceps." },
+cossack_squat: { name:"Kettlebell Cossack Squat", patron:"Sentadilla", unilateral:"Si", dificultad:4, twoKB:false, desc:"Sentadilla lateral profunda manteniendo una pierna extendida y el peso en el talón del pie de apoyo. excelente para la movilidad de cadera y fuerza asimétrica.", cue:"Levantar El Talón Del Pie De Apoyo, Encorvar La Espalda, No Bajar Lo Suficiente." },
+renegade_row: { name:"Kettlebell Renegade Row", patron:"Traccion", unilateral:"Si", dificultad:4, twoKB:true, desc:"En posición de plancha apoyado sobre las kettlebells, realizar un remo con un brazo mientras se estabiliza el cuerpo con el otro y el core.", cue:"Rotar Excesivamente La Cadera, Dejar Caer La Pelvis, No Mantener La Plancha Sólida." },
+thruster: { name:"Kettlebell Thruster", patron:"Empuje", unilateral:"Ambos", dificultad:4, twoKB:false, desc:"Combinación fluida de una sentadilla frontal profunda seguida inmediatamente de un press estricto por encima de la cabeza usando el impulso de las piernas.", cue:"Pausar Entre La Sentadilla Y El Press, Empujar Antes De Extender Las Caderas, Perder La Postura En La Sentadilla." },
+gorilla_row: { name:"Kettlebell Gorilla Row", patron:"Traccion", unilateral:"Ambos", dificultad:3, twoKB:true, desc:"Desde una posición de bisagra profunda (espalda casi paralela al suelo), remar una kettlebell mientras la otra mano se apoya en otra kettlebell en el suelo.", cue:"Levantar El Torso, Encorvar La Espalda Baja, No Mantener La Tensión En El Core." },
+hip_thrust: { name:"Kettlebell Hip Thrust", patron:"Bisagra", unilateral:"No", dificultad:2, twoKB:false, desc:"Apoyando la parte superior de la espalda en un banco, colocar la kettlebell sobre la pelvis y extender las caderas hacia arriba contrayendo los glúteos.", cue:"Hiperextender La Zona Lumbar En Lugar De Usar Los Glúteos, No Realizar El Rango De Movimiento Completo." },
+bench_press: { name:"Kettlebell Bench Press", patron:"Empuje", unilateral:"Ambos", dificultad:2, twoKB:false, desc:"Acuéstate boca arriba en un banco plano con una o dos kettlebells, apoyando firmemente los pies en el suelo, Agarra el asa de la pesa con fuerza manteniendo la muñeca neutra y los codos ligeramente metidos hacia las costillas para proteger los hombros", cue:"Acuéstate boca arriba en un banco plano con una o dos kettlebells, apoyando firmemente los pies en el suelo, Agarra el asa de la pesa con fuerza manteniendo la muñeca neutra y los codos ligeramente metidos hacia las" },
+plancha: { name:"Plank", patron:"Core", unilateral:"No", dificultad:1, twoKB:false, desc:"Sostener la posición de plancha con el core activo, formando una línea recta de cabeza a talones.", cue:"Mantén la cadera alineada con hombros y tobillos, sin dejarla caer ni elevarla en exceso." },
+sentadillas_bw: { name:"Bodyweight Squat", patron:"Sentadilla", unilateral:"No", dificultad:1, twoKB:false, desc:"Sentadilla con el propio peso corporal para activar la cadena inferior antes de cargar kettlebell.", cue:"Activación general antes de cargar peso: baja controlado, rodillas siguiendo la línea de los pies." },
+};
+const POOLS = {
+core:            ["windmill","turkish_getup","russian_twist"],
+sentadilla:      ["goblet_squat","bulgarian_squat","cossack_squat","lunge_estatica","lunge_intercalada","step_up"],
+bisagra:         ["swing_dos_manos","swing_una_mano","deadlift_kb","figure_8","hip_thrust"],
+empuje:          ["press","push_press","press_jerk","floor_press","thruster","bench_press"],
+empuje_finisher: ["thruster","push_press","press_jerk"],
+core_movilidad:  ["windmill","turkish_getup","halo","deadlift_una_pierna","russian_twist"],
+jalon:           ["snatch","tiron_alto"],
+jalon_d3:        ["tiron_alto","snatch"],
+traccion:        ["gorilla_row","remo_una_mano","remo_dos_manos","pullover","renegade_row"],
+traccion_d4:     ["remo_una_mano","pullover","renegade_row","remo_dos_manos","gorilla_row"],
+sentadilla_uni:  ["lunge_intercalada","lunge_estatica","step_up","cossack_squat","bulgarian_squat"],
+sentadilla_uni_d3:["cossack_squat","bulgarian_squat","lunge_estatica","lunge_intercalada","step_up"],
+movilidad:       ["halo","deadlift_una_pierna"],
+bisagra_d3:      ["swing_una_mano","swing_dos_manos","deadlift_kb","figure_8","hip_thrust"],
+core_hold:       ["plancha","russian_twist"],
+empuje_d4:       ["push_press","press","press_jerk","bench_press","floor_press","thruster"],
+carga:           ["clean","farmer_walk"],
+core_d5:         ["russian_twist","windmill","figure_8"],
+};
+function pick(poolName, week, offset){
+const pool = POOLS[poolName];
+return pool[((week-1)+(offset||0)) % pool.length];
+}
+const GENERAL_WARMUP = [
+{ name:"Neck Circles", reps:"10 reps", note:"Movimiento suave" },
+{ name:"Shoulder Rolls", reps:"10 reps", note:"Adelante y atrás" },
+{ name:"Hip Circles", reps:"10 reps", note:"Círculos amplios" },
+{ name:"Plank", reps:"30 seg", note:"Mantener postura recta" },
+{ name:"Bodyweight Squats", reps:"15 reps", note:"Bajar controlado" },
+{ name:"Glute Bridge", reps:"15 reps", note:"Contraer glúteos arriba" },
+{ name:"Skipping", reps:"30 seg", note:"Rodillas arriba" },
+{ name:"Jumping Jacks", reps:"30 seg", note:"Mantener ritmo" },
+{ name:"Lateral Shuffles", reps:"30 seg", note:"Flexionar rodillas" },
+];
+const SUGGESTED_WEIGHTS = [
+{ nivel:"Principiante", genero:"Mujer",  peso:"6 a 8 kg",   nota:"Puede subir a 10kg si domina la técnica" },
+{ nivel:"Principiante", genero:"Hombre", peso:"10 a 12 kg", nota:"Puede subir a 16kg si domina la técnica" },
+{ nivel:"Intermedio",   genero:"Mujer",  peso:"8 a 12 kg",  nota:"Puede subir a 16kg si domina la técnica" },
+{ nivel:"Intermedio",   genero:"Hombre", peso:"12 a 16 kg", nota:"Puede subir a 20kg si domina la técnica" },
+{ nivel:"Avanzado",     genero:"Mujer",  peso:"16 a 20 kg", nota:"Puede subir a 20kg si domina la técnica" },
+{ nivel:"Avanzado",     genero:"Hombre", peso:"20 a 24 kg", nota:"Puede subir a 28kg si domina la técnica" },
+];
+function buildDays(weekNum){
+const w = weekNum;
+return {
+day1: {
+label:"Día 1", meta:"Resistencia — cadena posterior + fuerza",
+warmup:{
+title:"Calentamiento", meta:"3 series · 60s descanso", restSeconds:60, rounds:3,
+moves:[
+{ ex:"sentadillas_bw", reps:"x30" },
+{ ex: pick("core", w, 0), reps:"x5/5" },
+{ ex: pick("core", w, 1), reps:"x5/5" },
+]
+},
+main:{
+title:"Secuencia principal", meta:"3 bloques independientes, cada uno con sus propias series",
+moves:[
+{ ex: pick("sentadilla", w, 0), reps:"x15", sets:4, rest:45, tag:"Fuerza — cadena inferior" },
+{ ex: pick("bisagra", w, 0),    reps:"x20", sets:4, rest:60, tag:"Fuerza — cadena posterior" },
+{ ex: pick("empuje", w, 0),     reps:"x8/8", sets:3, rest:60, tag:"Fuerza — tren superior · ambos lados" },
+]
+},
+finisher:{
+title:"Finalizador", meta:"2 series · 30s descanso · AMRAP alternando", restSeconds:30, rounds:2,
+moves:[ { ex: pick("empuje_finisher", w, 0), reps:"AMRAP" } ]
+}
+},
+day2: {
+label:"Día 2", meta:"Movilidad + fuerza tren inferior/superior",
+warmup:{
+title:"Calentamiento", meta:"2 series · 30s descanso", restSeconds:30, rounds:2,
+moves:[
+{ ex: pick("core_movilidad", w, 0), reps:"x5/5" },
+{ ex:"farmer_walk", reps:"34 pasos (ida y vuelta)" },
+]
+},
+main:{
+title:"Secuencia principal", meta:"2 bloques independientes, cada uno con sus propias series",
+moves:[
+{ ex: pick("jalon", w, 0),     reps:"x8/8", sets:5, rest:60, tag:"Fuerza — cadena inferior · alternando" },
+{ ex: pick("traccion", w, 0),  reps:"x20", sets:5, rest:60, tag:"Fuerza — tren superior · alternando" },
+]
+},
+finisher:{
+title:"Finalizador", meta:"3 series · 40s descanso", restSeconds:40, rounds:3,
+moves:[ { ex: pick("sentadilla_uni", w, 0), reps:"x12" } ]
+}
+},
+day3: {
+label:"Día 3", meta:"Movilidad + resistencia + hipertrofia",
+warmup:{
+title:"Calentamiento", meta:"4 series · 30s descanso", restSeconds:30, rounds:4,
+moves:[
+{ ex: pick("movilidad", w, 0), reps:"x10" },
+{ ex: pick("movilidad", w, 1), reps:"x5/5" },
+]
+},
+main:{
+title:"Secuencia principal", meta:"3 bloques independientes, cada uno con sus propias series",
+moves:[
+{ ex: pick("bisagra_d3", w, 0),      reps:"x15/15", sets:4, rest:60, tag:"Resistencia — cadena posterior · alternando" },
+{ ex: pick("jalon_d3", w, 0),         reps:"x10/10", sets:4, rest:60, tag:"Resistencia — cadena posterior · alternando" },
+{ ex: pick("sentadilla_uni_d3", w, 0),reps:"x10/10", sets:4, rest:60, tag:"Hipertrofia — tren superior · alternando" },
+]
+},
+finisher:{
+title:"Finalizador", meta:"2 series · 90s descanso", restSeconds:90, rounds:2,
+moves:[ { ex: pick("core_hold", w, 0), reps:"x90 segundos" } ]
+}
+},
+day4: {
+label:"Día 4", meta:"Fuerza funcional — tracción + empuje + carga",
+warmup:{
+title:"Calentamiento", meta:"2 series · 30s descanso", restSeconds:30, rounds:2,
+moves:[
+{ ex: pick("core", w, 2), reps:"x5/5" },
+{ ex: pick("movilidad", w, 1), reps:"x10" },
+]
+},
+main:{
+title:"Secuencia principal", meta:"3 bloques independientes, cada uno con sus propias series",
+moves:[
+{ ex: pick("traccion_d4", w, 0), reps:"x10/10", sets:4, rest:60, tag:"Fuerza — tracción · alternando" },
+{ ex: pick("empuje_d4", w, 0),   reps:"x8/8", sets:4, rest:60, tag:"Fuerza — empuje · alternando" },
+{ ex: pick("carga", w, 0),       reps:"x30 seg", sets:4, rest:45, tag:"Fuerza — carga/potencia" },
+]
+},
+finisher:{
+title:"Finalizador", meta:"2 series · 30s descanso · AMRAP", restSeconds:30, rounds:2,
+moves:[ { ex: pick("bisagra", w, 2), reps:"AMRAP" } ]
+}
+},
+day5: {
+label:"Día 5", meta:"Opcional — movilidad y core (desde semana 5)", optional:true, minWeek:5,
+warmup:{
+title:"Calentamiento", meta:"1 serie · 30s descanso", restSeconds:30, rounds:1,
+moves:[
+{ ex: pick("movilidad", w, 0), reps:"x10" },
+]
+},
+main:{
+title:"Secuencia principal (ligera)", meta:"2 bloques independientes, cada uno con sus propias series",
+moves:[
+{ ex: pick("core_d5", w, 0), reps:"x12", sets:3, rest:45, tag:"Core / estabilidad" },
+{ ex:"farmer_walk", reps:"20 pasos por lado", sets:3, rest:45, tag:"Carga ligera" },
+]
+},
+finisher:{
+title:"Finalizador", meta:"1 serie · 60s descanso", restSeconds:60, rounds:1,
+moves:[ { ex:"plancha", reps:"x60 segundos" } ]
+}
+}
+};
+}
+const PROGRESS_KEY = 'hierro_kova_progress_v1';
+function loadProgress(){
+try{
+const raw = localStorage.getItem(PROGRESS_KEY);
+return raw ? JSON.parse(raw) : { completed:{}, dates:{} };
+}catch(e){ return { completed:{}, dates:{} }; }
+}
+function saveProgress(){
+try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); }catch(e){  }
+}
+let progress = loadProgress();
+function todayStr(){
+const d = new Date();
+return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isDayComplete(week, dayKey){
+return !!progress.completed[`w${week}_${dayKey}`];
+}
+function markCurrentDayComplete(){
+const key = `w${currentWeek}_${currentDayKey}`;
+progress.completed[key] = todayStr();
+progress.dates[todayStr()] = true;
+saveProgress();
+updateStreakUI();
+renderDayTabs(buildDays(currentWeek));
+}
+function computeStreak(){
+const oneDay = 86400000;
+const today = new Date(todayStr()+'T00:00:00');
+let cursor = today;
+if (!progress.dates[todayStr()]){
+cursor = new Date(today.getTime() - oneDay);
+}
+let streak = 0;
+while (true){
+const key = `${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`;
+if (!progress.dates[key]) break;
+streak++;
+cursor = new Date(cursor.getTime() - oneDay);
+}
+return streak;
+}
+function updateStreakUI(){
+const el = document.getElementById('streakBadge');
+if (el) el.textContent = `🔥 ${computeStreak()} día${computeStreak()===1?'':'s'} de racha`;
+}
+let currentWeek = 1;
+let currentDayKey = "day1";
+let currentMoveRef = null;
+let secondsLeft = 60;
+let phaseTotal = 60;
+let currentRoundNow = 1;
+let currentRoundTotal = 1;
+let timerHandle = null;
+let running = false;
+const weekStrip = document.getElementById('weekStrip');
+const dayTabs = document.getElementById('dayTabs');
+const blocksContainer = document.getElementById('blocksContainer');
+const dialTime = document.getElementById('dialTime');
+const dialPhase = document.getElementById('dialPhase');
+const dialFill = document.getElementById('dialFill');
+const roundTrack = document.getElementById('roundTrack');
+const vName = document.getElementById('vName');
+const vTag = document.getElementById('vTag');
+const vNote = document.getElementById('vNote');
+const playBtn = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+const doneBtn = document.getElementById('doneBtn');
+doneBtn.addEventListener('click', markCurrentDayComplete);
+const CIRC = 2 * Math.PI * 88;
+function renderWeekStrip(){
+weekStrip.innerHTML = "";
+for (let w=1; w<=12; w++){
+const btn = document.createElement('button');
+btn.className = 'week-btn' + (w===currentWeek ? ' active':'');
+btn.textContent = w;
+btn.addEventListener('click', ()=>{ currentWeek = w; refreshAll(); });
+weekStrip.appendChild(btn);
+}
+}
+function renderDayTabs(days){
+dayTabs.innerHTML = "";
+const keys = ["day1","day2","day3","day4"];
+if (currentWeek >= 5) keys.push("day5");
+dayTabs.className = 'day-tabs' + (keys.length===5 ? ' five' : '');
+keys.forEach(key=>{
+const d = days[key];
+const btn = document.createElement('button');
+btn.className = 'day-btn' + (key===currentDayKey ? ' active':'');
+const doneMark = isDayComplete(currentWeek, key) ? ' ✓' : '';
+const optTag = d.optional ? '<span class="opt-tag">Opcional</span>' : '';
+btn.innerHTML = `${optTag}<span class="d-name">${d.label}${doneMark}</span><span class="d-meta">${d.meta}</span>`;
+btn.addEventListener('click', ()=>{ currentDayKey = key; currentMoveRef = null; refreshAll(); });
+dayTabs.appendChild(btn);
+});
+if (currentDayKey === "day5" && currentWeek < 5){
+currentDayKey = "day1";
+}
+}
+function renderBlocks(day){
+blocksContainer.innerHTML = "";
+["warmup","main","finisher"].forEach(blockKey=>{
+const block = day[blockKey];
+const div = document.createElement('div');
+div.className = 'block';
+let movesHtml = "";
+block.moves.forEach((m,i)=>{
+const ex = EXERCISES[m.ex];
+const isActive = currentMoveRef && currentMoveRef.blockKey===blockKey && currentMoveRef.moveIndex===i;
+const setsRest = (m.sets!==undefined && m.rest!==undefined) ? ` · ${m.sets}x · ${m.rest}s desc` : '';
+const tagLine = m.tag ? `<span class="move-tag">${m.tag}</span>` : '';
+movesHtml += `<div class="move-item${isActive?' active':''}" data-block="${blockKey}" data-index="${i}">
+<span class="move-name">${ex.name}${ex.twoKB ? ' <em>(2 KB)</em>' : ''}${tagLine}</span>
+<span class="move-reps">${m.reps}${setsRest}</span>
+</div>`;
+});
+div.innerHTML = `
+<div class="block-title">${block.title}</div>
+<div class="block-meta">${block.meta}</div>
+<div class="move-list">${movesHtml}</div>
+${block.note ? `<div class="block-note">${block.note}</div>` : ""}
+`;
+blocksContainer.appendChild(div);
+});
+blocksContainer.querySelectorAll('.move-item').forEach(item=>{
+item.addEventListener('click', ()=>{
+const blockKey = item.getAttribute('data-block');
+const index = parseInt(item.getAttribute('data-index'));
+selectMove(blockKey, index);
+});
+});
+}
+function selectMove(blockKey, index){
+currentMoveRef = { blockKey, moveIndex:index };
+const days = buildDays(currentWeek);
+const day = days[currentDayKey];
+const block = day[blockKey];
+const move = block.moves[index];
+const ex = EXERCISES[move.ex];
+vName.textContent = ex.name;
+const tagPart = move.tag ? `${move.tag} · ` : '';
+vTag.textContent = `${tagPart}${move.reps}`;
+const difDots = "●".repeat(ex.dificultad) + "○".repeat(5-ex.dificultad);
+const metaLine = `Patrón: ${ex.patron} · Dificultad ${difDots} · ${ex.unilateral==="Si" ? "Unilateral" : ex.unilateral==="Ambos" ? "Uni o bilateral" : "Bilateral"}${ex.twoKB ? " · requiere 2 kettlebells" : ""}`;
+const descPart = ex.desc ? `<br><br><b>Cómo se hace:</b> ${ex.desc}` : '';
+const cuePart = ex.cue ? `<br><br><b>Evita:</b> ${ex.cue}` : '';
+vNote.innerHTML = `${metaLine}${descPart}${cuePart}`;
+stopTimer();
+phaseTotal = (move.rest !== undefined ? move.rest : block.restSeconds) || 60;
+secondsLeft = phaseTotal;
+currentRoundNow = 1;
+currentRoundTotal = (move.sets !== undefined ? move.sets : block.rounds) || 1;
+dialPhase.textContent = blockKey === "finisher" ? "RITMO / DESCANSO" : blockKey === "main" ? "DESCANSO" : "TRANSICIÓN";
+updateDial();
+renderBlocks(day);
+}
+function updateDial(){
+dialTime.textContent = secondsLeft;
+roundTrack.innerHTML = `Ronda <b>${currentRoundNow}</b> / ${currentRoundTotal}`;
+const fraction = secondsLeft / phaseTotal;
+dialFill.style.strokeDasharray = CIRC;
+dialFill.style.strokeDashoffset = CIRC * (1 - fraction);
+}
+function getFlatMoves(day){
+const flat = [];
+["warmup","main","finisher"].forEach(bk=>{
+day[bk].moves.forEach((m,i)=> flat.push({ blockKey:bk, index:i }));
+});
+return flat;
+}
+function beep(){
+try{
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+osc.connect(gain); gain.connect(ctx.destination);
+osc.frequency.value = 880;
+gain.gain.setValueAtTime(0.15, ctx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+osc.start(); osc.stop(ctx.currentTime + 0.4);
+}catch(e){  }
+if (navigator.vibrate) navigator.vibrate(200);
+}
+function advanceToNextMove(){
+beep();
+const days = buildDays(currentWeek);
+const day = days[currentDayKey];
+const flat = getFlatMoves(day);
+const curIdx = flat.findIndex(f=>f.blockKey===currentMoveRef.blockKey && f.index===currentMoveRef.moveIndex);
+if (curIdx === -1 || curIdx === flat.length-1){
+stopTimer();
+dialPhase.textContent = "¡DÍA COMPLETO!";
+updateDial();
+markCurrentDayComplete();
+return;
+}
+const next = flat[curIdx+1];
+selectMove(next.blockKey, next.index);
+startTimer();
+}
+function tick(){
+secondsLeft--;
+if (secondsLeft < 0){
+currentRoundNow++;
+if (currentRoundNow > currentRoundTotal){
+advanceToNextMove();
+return;
+}
+secondsLeft = phaseTotal;
+}
+updateDial();
+}
+function startTimer(){
+if (running) return;
+running = true;
+playBtn.textContent = "Pausar";
+timerHandle = setInterval(tick, 1000);
+}
+function stopTimer(){
+running = false;
+playBtn.textContent = "Iniciar";
+clearInterval(timerHandle);
+}
+function resetTimer(){
+stopTimer();
+secondsLeft = phaseTotal;
+currentRoundNow = 1;
+updateDial();
+}
+playBtn.addEventListener('click', ()=>{ running ? stopTimer() : startTimer(); });
+resetBtn.addEventListener('click', resetTimer);
+function renderStaticSections(){
+const wBody = document.getElementById('weightsBody');
+wBody.innerHTML = SUGGESTED_WEIGHTS.map(r=>
+`<tr><td>${r.nivel}</td><td>${r.genero}</td><td>${r.peso}</td><td>${r.nota}</td></tr>`
+).join('');
+const gGrid = document.getElementById('genWarmGrid');
+gGrid.innerHTML = GENERAL_WARMUP.map(g=>
+`<div class="genwarm-item"><b>${g.name}</b><span>${g.reps}</span></div>`
+).join('');
+}
+renderStaticSections();
+function refreshAll(){
+const days = buildDays(currentWeek);
+document.getElementById('blockNotice').innerHTML = `<b>Semana ${currentWeek}</b> · los ejercicios de cada patrón rotan semana a semana (nunca dos semanas seguidas repiten la misma selección) · series y descanso son los que Norman definió para cada bloque`;
+renderWeekStrip();
+renderDayTabs(days);
+renderBlocks(days[currentDayKey]);
+updateStreakUI();
+const done = isDayComplete(currentWeek, currentDayKey);
+doneBtn.textContent = done ? "✓ Día completado" : "✓ Marcar día completo";
+doneBtn.classList.toggle('done', done);
+if (!currentMoveRef){
+selectMove("warmup", 0);
+} else {
+selectMove(currentMoveRef.blockKey, currentMoveRef.moveIndex);
+}
+}
+refreshAll();
+</script>
+</body>
+</html>
