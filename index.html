@@ -921,6 +921,30 @@ if (w < 3) return "Principiante";
 if (w < 6) return "Intermedio";
 return "Avanzado";
 }
+function restFactorForWeek(w){
+if (w <= 2) return 1;
+if (w <= 5) return 0.75;
+if (w === 6) return 0.6;
+if (w <= 9) return 0.55;
+return 0.45;
+}
+function scaleRest(sec, factor, floor){
+if (typeof sec !== "number") return sec;
+return Math.max(floor, Math.round((sec * factor) / 5) * 5);
+}
+function applyRestScaling(days, w){
+const factor = restFactorForWeek(w);
+if (factor === 1) return days;
+Object.keys(days).forEach(dk=>{
+const day = days[dk];
+["warmup","main","finisher"].forEach(bk=>{
+if (!day[bk] || !day[bk].moves) return;
+const floor = bk === "main" ? 25 : 15;
+day[bk].moves.forEach(m=>{ m.rest = scaleRest(m.rest, factor, floor); });
+});
+});
+return days;
+}
 function buildExtraDays(weekNum){
 const w = weekNum;
 return {
@@ -983,16 +1007,14 @@ coreDays = JSON.parse(JSON.stringify(WEEK_PROGRAM[w]));
 const baseWeek = ((w - 7) % 6) + 1;
 coreDays = JSON.parse(JSON.stringify(WEEK_PROGRAM[baseWeek]));
 const setsBump = w <= 9 ? 1 : 2;
-const restCut  = w <= 9 ? 10 : 20;
 ["day1","day2","day3"].forEach(dk=>{
 const day = coreDays[dk];
 day.meta = day.meta + " · Ciclo 2 (Avanzado)";
-day.main.moves.forEach(m=>{ m.sets = m.sets + setsBump; m.rest = Math.max(30, m.rest - restCut); });
-day.warmup.moves.forEach(m=>{ m.rest = Math.max(20, m.rest - Math.floor(restCut/2)); });
-day.finisher.moves.forEach(m=>{ m.rest = Math.max(20, m.rest - Math.floor(restCut/2)); });
+day.main.moves.forEach(m=>{ m.sets = m.sets + setsBump; });
 });
 }
-return Object.assign(coreDays, buildExtraDays(w));
+const allDays = Object.assign(coreDays, buildExtraDays(w));
+return applyRestScaling(allDays, w);
 }
 const PROGRESS_KEY = 'hierro_kova_progress_v2';
 function loadProgress(){
@@ -1221,7 +1243,7 @@ function transitionBeep(){
 tone(880, 0.4, 0.16);
 if (navigator.vibrate) navigator.vibrate(200);
 }
-const BLOCK_TRANSITION_REST = 20;
+const BLOCK_TRANSITION_REST = 25;
 function buildSessionQueue(day){
 const queue = [];
 const order = ["warmup","main","finisher"];
