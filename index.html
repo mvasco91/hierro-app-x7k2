@@ -197,7 +197,7 @@
       </div>
       <div class="round-track" id="roundTrack">Serie <b>1</b> / 4</div>
       <div class="controls">
-        <button class="ctrl-btn primary" id="playBtn">Iniciar descanso</button>
+        <button class="ctrl-btn primary" id="playBtn">Iniciar</button>
         <button class="ctrl-btn" id="resetBtn">Reiniciar</button>
       </div>
       <button class="ctrl-btn done-btn" id="doneBtn">✓ Marcar día completo</button>
@@ -208,12 +208,12 @@
         <div class="v-name" id="vName">—</div>
         <div class="v-tag" id="vTag">—</div>
       </div>
-      <div class="v-note" id="vNote">Selecciona un ejercicio de la lista para verlo aquí. Haz tu serie a tu ritmo y luego pulsa "Iniciar descanso": el contador cuenta el descanso prescrito, suena en los últimos 5 segundos (5-4-3-2-1) y pasa solo a la siguiente serie o ejercicio.</div>
+      <div class="v-note" id="vNote">Selecciona un ejercicio de la lista para verlo aquí. Si el ejercicio es por tiempo (ej. "x90 segundos"), pulsa Iniciar y el contador hace solo el trabajo y el descanso, ronda tras ronda. Si es por repeticiones, haz tu serie a tu ritmo y pulsa "Iniciar descanso" al terminarla. Suena 5-4-3-2-1 antes de cada cambio.</div>
     </div>
   </div>
 
   <footer>
-    Toca cualquier ejercicio de la lista para ver sus datos técnicos y cargar su descanso · Haz tu serie, pulsa "Iniciar descanso" y el contador avanza solo al terminar, con beep en los últimos 5 segundos<br>
+    Toca cualquier ejercicio para ver sus datos técnicos · Ejercicios por tiempo: el contador hace trabajo + descanso solo · Ejercicios por repeticiones: pulsa "Iniciar descanso" después de cada serie · Beep 5-4-3-2-1 antes de cada cambio<br>
     Metodología y taxonomía de movimientos: Norman (KOVA) — Entregable_Norman_1.xlsx · Progresión de 12 semanas inspirada en el programa Kaizen Kettlebell
   </footer>
 </div>
@@ -1039,7 +1039,9 @@ if (el) el.textContent = `🔥 ${s} día${s===1?'':'s'} de racha`;
 let currentWeek = 1;
 let currentDayKey = "day1";
 let currentMoveRef = null;
-let timerPhase = "rest";        // "rest" es la única fase automática (la serie/repetición la marca el usuario a su ritmo)
+let timerPhase = "ready-rest";  // "ready-work" | "work" | "ready-rest" | "rest"
+let currentMoveRest = 60;
+let currentWorkSeconds = 0;     // >0 si el ejercicio actual tiene una duración de trabajo cronometrada
 let secondsLeft = 60;
 let phaseTotal = 60;
 let currentRoundNow = 1;
@@ -1130,6 +1132,15 @@ selectMove(blockKey, index);
 });
 });
 }
+function parseWorkSeconds(repsStr){
+if (!repsStr) return 0;
+const s = String(repsStr);
+let m = s.match(/(\d+)\s*(segundos|seg)\b/i);
+if (m) return parseInt(m[1],10);
+m = s.match(/(\d+)\s*min/i);
+if (m) return parseInt(m[1],10) * 60;
+return 0;
+}
 function selectMove(blockKey, index){
 currentMoveRef = { blockKey, moveIndex:index };
 const days = buildDays(currentWeek);
@@ -1147,17 +1158,36 @@ const descPart = ex.desc ? `<br><br><b>Cómo se hace:</b> ${ex.desc}` : '';
 const cuePart = ex.cue ? `<br><br><b>Evita:</b> ${ex.cue}` : '';
 vNote.innerHTML = `${metaLine}${descPart}${cuePart}`;
 stopTimer();
-phaseTotal = move.rest || 60;
-secondsLeft = phaseTotal;
+currentMoveRest = move.rest || 60;
+currentWorkSeconds = parseWorkSeconds(move.reps);
 currentRoundNow = 1;
 currentRoundTotal = move.sets || 1;
-dialPhase.textContent = "DESCANSO";
+if (currentWorkSeconds > 0){
+timerPhase = "ready-work";
+phaseTotal = currentWorkSeconds;
+dialPhase.textContent = "LISTO — PULSA PARA TRABAJAR";
+} else {
+timerPhase = "ready-rest";
+phaseTotal = currentMoveRest;
+dialPhase.textContent = "LISTO — HAZ TU SERIE";
+}
+secondsLeft = phaseTotal;
 updateDial();
 renderBlocks(day);
 }
 function updateDial(){
 dialTime.textContent = secondsLeft;
-roundTrack.innerHTML = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — descansa <b>${phaseTotal}s</b> entre series`;
+let roundHint;
+if (timerPhase === "work"){
+roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — trabajando (${phaseTotal}s)`;
+} else if (timerPhase === "rest"){
+roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — descansando (${phaseTotal}s)`;
+} else if (timerPhase === "ready-work"){
+roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — pulsa "Iniciar" para contar los ${phaseTotal}s de trabajo`;
+} else {
+roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — haz la serie y pulsa "Iniciar descanso"`;
+}
+roundTrack.innerHTML = roundHint;
 const fraction = phaseTotal > 0 ? secondsLeft / phaseTotal : 0;
 dialFill.style.strokeDasharray = CIRC;
 dialFill.style.strokeDashoffset = CIRC * (1 - fraction);
@@ -1213,7 +1243,9 @@ return;
 }
 const next = flat[curIdx+1];
 selectMove(next.blockKey, next.index);
+if (timerPhase === "ready-work"){
 startTimer();
+}
 }
 function tick(){
 secondsLeft--;
@@ -1221,12 +1253,31 @@ if (secondsLeft >= 1 && secondsLeft <= 5){
 tickBeep();
 }
 if (secondsLeft < 0){
+if (timerPhase === "work"){
+transitionBeep();
+timerPhase = "rest";
+phaseTotal = currentMoveRest;
+secondsLeft = phaseTotal;
+dialPhase.textContent = "DESCANSO";
+updateDial();
+return;
+}
 currentRoundNow++;
 if (currentRoundNow > currentRoundTotal){
 advanceToNextMove();
 return;
 }
 transitionBeep();
+if (currentWorkSeconds > 0){
+timerPhase = "work";
+phaseTotal = currentWorkSeconds;
+dialPhase.textContent = "TRABAJO";
+} else {
+stopTimer();
+timerPhase = "ready-rest";
+phaseTotal = currentMoveRest;
+dialPhase.textContent = "LISTO — HAZ TU SERIE";
+}
 secondsLeft = phaseTotal;
 }
 updateDial();
@@ -1235,17 +1286,30 @@ function startTimer(){
 if (running) return;
 running = true;
 playBtn.textContent = "Pausar";
+if (timerPhase === "ready-work") timerPhase = "work";
+else if (timerPhase === "ready-rest") timerPhase = "rest";
+dialPhase.textContent = timerPhase === "work" ? "TRABAJO" : "DESCANSO";
 timerHandle = setInterval(tick, 1000);
+updateDial();
 }
 function stopTimer(){
 running = false;
-playBtn.textContent = "Iniciar descanso";
+playBtn.textContent = currentWorkSeconds > 0 ? "Iniciar" : "Iniciar descanso";
 clearInterval(timerHandle);
 }
 function resetTimer(){
 stopTimer();
-secondsLeft = phaseTotal;
 currentRoundNow = 1;
+if (currentWorkSeconds > 0){
+timerPhase = "ready-work";
+phaseTotal = currentWorkSeconds;
+dialPhase.textContent = "LISTO — PULSA PARA TRABAJAR";
+} else {
+timerPhase = "ready-rest";
+phaseTotal = currentMoveRest;
+dialPhase.textContent = "LISTO — HAZ TU SERIE";
+}
+secondsLeft = phaseTotal;
 updateDial();
 }
 playBtn.addEventListener('click', ()=>{ running ? stopTimer() : startTimer(); });
