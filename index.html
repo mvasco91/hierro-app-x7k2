@@ -1262,12 +1262,7 @@ let sessionActive = false;
 function blockTitle(blockKey){
 return blockKey === "warmup" ? "Calentamiento" : blockKey === "main" ? "Secuencia principal" : blockKey === "finisher" ? "Finalizador" : "";
 }
-function loadSessionStep(i){
-const days = buildDays(currentWeek);
-const day = days[currentDayKey];
-const step = sessionQueue[i];
-phaseTotal = step.seconds;
-secondsLeft = step.seconds;
+function renderSessionStepInfo(step, day){
 if (step.kind === "work"){
 const move = day[step.blockKey].moves[step.moveIndex];
 const ex = EXERCISES[move.ex];
@@ -1278,7 +1273,6 @@ vTag.textContent = `${tagPart}${move.reps}`;
 vNote.innerHTML = exerciseInfoHtml(ex, move);
 dialPhase.textContent = `TRABAJO — ${blockTitle(step.blockKey)}`;
 roundTrack.innerHTML = `Ronda/serie <b>${step.roundNow}</b> / ${step.roundTotal} — ${ex.name}`;
-renderBlocks(day);
 } else {
 currentMoveRef = step.moveIndex !== null ? { blockKey: step.blockKey, moveIndex: step.moveIndex } : null;
 vName.textContent = step.transition ? "Cambio de bloque" : "Descanso";
@@ -1288,8 +1282,16 @@ vNote.innerHTML = step.transition
 : `${step.label || "Descanso"} antes de continuar.`;
 dialPhase.textContent = "DESCANSO";
 roundTrack.innerHTML = step.transition ? "Transición entre bloques" : `Ronda/serie <b>${step.roundNow}</b> / ${step.roundTotal} — descansando`;
+}
 renderBlocks(day);
 }
+function loadSessionStep(i){
+const days = buildDays(currentWeek);
+const day = days[currentDayKey];
+const step = sessionQueue[i];
+phaseTotal = step.seconds;
+secondsLeft = step.seconds;
+renderSessionStepInfo(step, day);
 updateDial();
 }
 function startWorkoutSession(){
@@ -1300,6 +1302,7 @@ if (sessionQueue.length === 0) return;
 loadSessionStep(0);
 running = true;
 playBtn.textContent = "Pausar";
+playBtn.style.display = "";
 startBtn.style.display = "none";
 skipBtn.style.display = "";
 stopSessionBtn.style.display = "";
@@ -1311,6 +1314,7 @@ sessionActive = false;
 clearInterval(timerHandle);
 startBtn.style.display = "";
 startBtn.textContent = "▶ Iniciar entrenamiento";
+playBtn.style.display = "none";
 skipBtn.style.display = "none";
 stopSessionBtn.style.display = "none";
 playBtn.textContent = "Pausar";
@@ -1347,10 +1351,14 @@ updateDial();
 function pauseSession(){
 running = false;
 playBtn.textContent = "Reanudar";
+dialPhase.textContent += " (PAUSADO — toca un ejercicio para consultarlo)";
 clearInterval(timerHandle);
 }
 function resumeSession(){
 if (!sessionActive || running) return;
+const days = buildDays(currentWeek);
+renderSessionStepInfo(sessionQueue[sessionIndex], days[currentDayKey]);
+updateDial();
 running = true;
 playBtn.textContent = "Pausar";
 timerHandle = setInterval(tick, 1000);
