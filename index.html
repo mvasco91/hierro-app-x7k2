@@ -945,6 +945,51 @@ day[bk].moves.forEach(m=>{ m.rest = scaleRest(m.rest, factor, floor); });
 });
 return days;
 }
+function patronKey(p){
+const s = (p || "").toLowerCase();
+if (s.indexOf("bisagra") >= 0) return "bisagra";
+if (s.indexOf("sentadilla") >= 0) return "sentadilla";
+if (s.indexOf("empuje") >= 0) return "empuje";
+if (s.indexOf("traccion") >= 0 || s.indexOf("jalon") >= 0) return "traccion";
+if (s.indexOf("carga") >= 0) return "carga";
+if (s.indexOf("core") >= 0) return "core";
+if (s.indexOf("movilidad") >= 0) return "movilidad";
+return "otro";
+}
+const KB_PATTERN_POOL = {};
+const CAL_PATTERN_POOL = {};
+Object.keys(EXERCISES).forEach(slug=>{
+const ex = EXERCISES[slug];
+const key = patronKey(ex.patron);
+const bucket = ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL;
+(bucket[key] = bucket[key] || []).push(slug);
+});
+function varyExerciseForCiclo2(origSlug, cicloOffset, usedInDay){
+const ex = EXERCISES[origSlug];
+if (!ex) return origSlug;
+const fullPool = (ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL)[patronKey(ex.patron)] || [];
+if (fullPool.length <= 1) return origSlug;
+const sameUni = fullPool.filter(s => EXERCISES[s].unilateral === ex.unilateral);
+const harder = (list) => list
+.filter(s => s !== origSlug && !usedInDay.has(s) && EXERCISES[s].dificultad >= ex.dificultad)
+.sort((a,b)=> EXERCISES[a].dificultad - EXERCISES[b].dificultad);
+const rotate = (list) => {
+const baseIdx = Math.max(0, list.indexOf(origSlug));
+for (let step = 0; step < list.length; step++){
+const candidate = list[(baseIdx + cicloOffset + step) % list.length];
+if (candidate !== origSlug && !usedInDay.has(candidate)) return candidate;
+}
+return null;
+};
+// Prioridad: 1) misma lateralidad + igual o más difícil, 2) cualquier lateralidad + igual o
+// más difícil (para no bajar la exigencia solo por mantener el patrón unilateral/bilateral
+// exacto), 3) misma lateralidad sin importar dificultad, 4) cualquiera del mismo patrón.
+const h1 = harder(sameUni); if (h1.length) return h1[(cicloOffset - 1) % h1.length];
+const h2 = harder(fullPool); if (h2.length) return h2[(cicloOffset - 1) % h2.length];
+const r1 = rotate(sameUni); if (r1) return r1;
+const r2 = rotate(fullPool); if (r2) return r2;
+return origSlug;
+}
 function buildExtraDays(weekNum){
 const w = weekNum;
 return {
@@ -1007,9 +1052,17 @@ coreDays = JSON.parse(JSON.stringify(WEEK_PROGRAM[w]));
 const baseWeek = ((w - 7) % 6) + 1;
 coreDays = JSON.parse(JSON.stringify(WEEK_PROGRAM[baseWeek]));
 const setsBump = w <= 9 ? 1 : 2;
+const cicloOffset = w - 6;
 ["day1","day2","day3"].forEach(dk=>{
 const day = coreDays[dk];
 day.meta = day.meta + " · Ciclo 2 (Avanzado)";
+const usedInDay = new Set();
+["warmup","main","finisher"].forEach(bk=>{
+day[bk].moves.forEach(m=>{
+m.ex = varyExerciseForCiclo2(m.ex, cicloOffset, usedInDay);
+usedInDay.add(m.ex);
+});
+});
 day.main.moves.forEach(m=>{ m.sets = m.sets + setsBump; });
 });
 }
