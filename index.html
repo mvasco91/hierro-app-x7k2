@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>HIERRO — Programa KOVA 12 Semanas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -11,7 +14,7 @@
   :root{
     --bg-solid:#181614; --surface:#221f1c; --surface-2:#2b2723; --surface-3:#332c22;
     --brass:#c68a3e; --brass-bright:#e4a94f; --chalk:#ece6d8; --chalk-dim:#a89f8f;
-    --rest:#6f8f6a; --line:#3a352e; --off:#57524a;
+    --rest:#6f8f6a; --line:#3a352e; --off:#57524a; --urgent:#c65c3e;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%;}
@@ -105,7 +108,8 @@
   .dial-track{ fill:none; stroke:var(--line); stroke-width:8; }
   .dial-fill{ fill:none; stroke:var(--brass); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
   .dial-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-  .dial-time{ font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; letter-spacing:1px; }
+  .dial-time{ font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; letter-spacing:1px; transition:color .15s ease; }
+  .dial-time.dial-urgent{ color:var(--urgent); }
   .dial-phase{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--brass-bright); margin-top:6px; text-align:center; padding:0 8px; }
   .round-track{ font-family:'Space Mono',monospace; font-size:12px; color:var(--chalk-dim); letter-spacing:1px; text-align:center; }
   .round-track b{ color:var(--chalk); }
@@ -156,7 +160,7 @@
   </header>
 
   <div class="notice">
-    <b>Sobre este plan:</b> ejercicios, patrones de movimiento, dificultad y errores comunes tomados directamente de la biblioteca de Norman ("Entregable_Norman.xlsx" — 31 movimientos con kettlebell). La estructura de cada día (calentamiento, bloques principales y finalizador) y sus series/descansos son los que Norman definió para la Semana 1; cada semana, dentro de ese mismo esqueleto, el ejercicio que llena cada patrón (bisagra, sentadilla, empuje, tracción, jalón, carga, core, movilidad) rota — así ninguna semana repite exactamente la misma selección. El calentamiento general de abajo (movilidad articular + activación + preparación dinámica) se hace siempre, antes del calentamiento específico del día.
+    <b>Sobre este plan:</b> los Días 1, 2 y 3 de cada semana (1 a 6) son el programa exacto que Norman definió en "Entregable_Norman_1.xlsx" — mismos ejercicios, series, reps y descansos de su hoja PROGRAMA, que ya varían día a día y semana a semana. Cada finalizador combina al menos un movimiento de kettlebell y uno de calistenia (hoja MOVIMIENTOS CALISTENIA). El Día 4 (fijo) y el Día 5 (opcional, desde semana 5) no están en el Excel de Norman, así que se arman con la misma biblioteca de movimientos rotando por semana. De la semana 7 a la 12 se repite el esqueleto de Norman (semanas 1-6) pero con la sobrecarga progresiva del programa Kaizen en el que se basa este plan: más series y menos descanso cada 3 semanas.
   </div>
   <div class="notice" id="blockNotice" style="border-color:var(--line);"></div>
 
@@ -191,9 +195,9 @@
           <div class="dial-phase" id="dialPhase">DESCANSO</div>
         </div>
       </div>
-      <div class="round-track" id="roundTrack">Ronda <b>1</b> / 4</div>
+      <div class="round-track" id="roundTrack">Serie <b>1</b> / 4</div>
       <div class="controls">
-        <button class="ctrl-btn primary" id="playBtn">Iniciar</button>
+        <button class="ctrl-btn primary" id="playBtn">Iniciar descanso</button>
         <button class="ctrl-btn" id="resetBtn">Reiniciar</button>
       </div>
       <button class="ctrl-btn done-btn" id="doneBtn">✓ Marcar día completo</button>
@@ -204,13 +208,13 @@
         <div class="v-name" id="vName">—</div>
         <div class="v-tag" id="vTag">—</div>
       </div>
-      <div class="v-note" id="vNote">Selecciona un ejercicio de la lista para verlo aquí.</div>
+      <div class="v-note" id="vNote">Selecciona un ejercicio de la lista para verlo aquí. Haz tu serie a tu ritmo y luego pulsa "Iniciar descanso": el contador cuenta el descanso prescrito, suena en los últimos 5 segundos (5-4-3-2-1) y pasa solo a la siguiente serie o ejercicio.</div>
     </div>
   </div>
 
   <footer>
-    Toca cualquier ejercicio de la lista para ver sus datos técnicos y cargar su temporizador · El timer usa el descanso/series prescritos para esa sección<br>
-    Metodología y taxonomía de movimientos: Norman (KOVA) — Entregable_Norman.xlsx
+    Toca cualquier ejercicio de la lista para ver sus datos técnicos y cargar su descanso · Haz tu serie, pulsa "Iniciar descanso" y el contador avanza solo al terminar, con beep en los últimos 5 segundos<br>
+    Metodología y taxonomía de movimientos: Norman (KOVA) — Entregable_Norman_1.xlsx · Progresión de 12 semanas inspirada en el programa Kaizen Kettlebell
   </footer>
 </div>
 
@@ -276,31 +280,155 @@ hip_thrust: { name:"Kettlebell Hip Thrust", patron:"Bisagra", unilateral:"No", d
 bench_press: { name:"Kettlebell Bench Press", patron:"Empuje", unilateral:"Ambos", dificultad:2, twoKB:false, desc:"Acuéstate boca arriba en un banco plano con una o dos kettlebells, apoyando firmemente los pies en el suelo, Agarra el asa de la pesa con fuerza manteniendo la muñeca neutra y los codos ligeramente metidos hacia las costillas para proteger los hombros", cue:"Acuéstate boca arriba en un banco plano con una o dos kettlebells, apoyando firmemente los pies en el suelo, Agarra el asa de la pesa con fuerza manteniendo la muñeca neutra y los codos ligeramente metidos hacia las" },
 plancha: { name:"Plank", patron:"Core", unilateral:"No", dificultad:1, twoKB:false, desc:"Sostener la posición de plancha con el core activo, formando una línea recta de cabeza a talones.", cue:"Mantén la cadera alineada con hombros y tobillos, sin dejarla caer ni elevarla en exceso." },
 sentadillas_bw: { name:"Bodyweight Squat", patron:"Sentadilla", unilateral:"No", dificultad:1, twoKB:false, desc:"Sentadilla con el propio peso corporal para activar la cadena inferior antes de cargar kettlebell.", cue:"Activación general antes de cargar peso: baja controlado, rodillas siguiendo la línea de los pies." },
+iron_trident: { name:"Kettlebell Iron Trident", patron:"Core", unilateral:"No", dificultad:4, twoKB:false, kind:"kb", desc:"Trabaja el core atacando la anti-rotación, la anti-flexión lateral y la anti-flexión frontal de manera simultánea. Aprieta los glúteos, el abdomen y mantén firme la pesa rusa durante todo el recorrido.", cue:"Controla el movimiento sin dejar que la kettlebell te desestabilice en ningun eje; evita rotar la cadera o perder la contraccion abdominal." },
+cal_flexiones_de_pecho: { name:"Push-ups", patron:"Empuje", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Empuje horizontal en suelo manteniendo el cuerpo alineado y codos a 45 grados.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_inclinadas: { name:"Incline Push-ups", patron:"Empuje", unilateral:"No", dificultad:1, twoKB:false, kind:"calistenia", desc:"Manos en superficie elevada reduciendo la resistencia para dominar el patrón de empuje.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_declinadas: { name:"Decline Push-ups", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Pies sobre superficie elevada aumentando la carga sobre hombros y pecho superior.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_fondos_en_paralelas: { name:"Parallel Bar Dips", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Suspensión en barras paralelas descendiendo con codos a 90 grados y torso controlado.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_fondos_en_banco: { name:"Bench Dips", patron:"Empuje", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Apoyo de manos por detrás en banco para enfatizar tríceps y deltoides anterior.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_agarre_ancho: { name:"Wide Grip Push-ups", patron:"Empuje", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Manos colocadas a mayor distancia que el ancho de hombros para mayor énfasis pectoral.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_fondos_en_paralelas_pecho: { name:"Chest Dips", patron:"Empuje", unilateral:"No", dificultad:4, twoKB:false, kind:"calistenia", desc:"Fondos en barras con ligera inclinación anterior del tronco para enfocar el pectoral.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_dominadas_prono: { name:"Pull-ups", patron:"Traccion", unilateral:"No", dificultad:4, twoKB:false, kind:"calistenia", desc:"Tracción vertical en barra fija con palmas hacia el frente trabajando dorsal ancho y antebrazos.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_dominadas_supino: { name:"Chin-ups", patron:"Traccion", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Tracción vertical con palmas hacia el cuerpo enfatizando la activación de bíceps y dorsal inferior.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_dominadas_neutras: { name:"Neutral Grip Pull-ups", patron:"Traccion", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Tracción en agarre neutro con palmas enfrentadas, reduciendo la tensión articular en hombros y muñecas.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_remo_autocarga: { name:"Inverted Row", patron:"Traccion", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Tracción horizontal en barra baja o anillas con talones apoyados, activando romboides y dorsal medio.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_remo_autocarga_elevado: { name:"Feet-Elevated Inverted Row", patron:"Traccion", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Variante de remo horizontal con pies elevados en banco para aumentar la resistencia por gravedad.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_sentadillas_profundas: { name:"Deep Squats", patron:"Sentadilla", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Flexión profunda de cadera y rodillas superando la paralela con talones firmes y columna neutra.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_sentadillas_con_salto: { name:"Jump Squats", patron:"Sentadilla", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Extensión explosiva triple de cadera, rodillas y tobillos con despegue vertical y caída suave.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_avanzadas_estaticas: { name:"Split Squats", patron:"Sentadilla", unilateral:"Si", dificultad:2, twoKB:false, kind:"calistenia", desc:"Zancada con pies estáticos descendiendo la rodilla trasera verticalmente a 90 grados.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_avanzadas_intercaladas: { name:"Alternating Lunges", patron:"Sentadilla", unilateral:"Si", dificultad:2, twoKB:false, kind:"calistenia", desc:"Pasos alternados hacia adelante o atrás manteniendo estabilidad de pelvis y torso erguido.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_sentadillas_bulgaras: { name:"Bulgarian Split Squats", patron:"Sentadilla", unilateral:"Si", dificultad:3, twoKB:false, kind:"calistenia", desc:"Pie trasero elevado sobre banco enfocando la carga en el cuádriceps y glúteo de la pierna delantera.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_ascensos_a_cajon: { name:"Box Step-ups", patron:"Sentadilla", unilateral:"Si", dificultad:2, twoKB:false, kind:"calistenia", desc:"Subir a superficie elevada empujando con toda la planta del pie adelantado de manera controlada.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_elevacion_pantorrilla_doble: { name:"Standing Calf Raises", patron:"Movilidad", unilateral:"No", dificultad:1, twoKB:false, kind:"calistenia", desc:"Elevación sobre las puntas de ambos pies para contraer sóleos y gemelos en rango completo.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_elevacion_pantorrilla_individual: { name:"Single Leg Calf Raises", patron:"Movilidad", unilateral:"Si", dificultad:2, twoKB:false, kind:"calistenia", desc:"Elevación unipodal de talón concentrando toda la sobrecarga corporal en una sola pantorrilla.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_sentadilla_pistol_asistida: { name:"Assisted Pistol Squats", patron:"Sentadilla", unilateral:"Si", dificultad:4, twoKB:false, kind:"calistenia", desc:"Descenso unilateral completo sosteniéndose de apoyo para ganar fuerza y rango de movimiento.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_sentadilla_pistol: { name:"Pistol Squats", patron:"Sentadilla", unilateral:"Si", dificultad:5, twoKB:false, kind:"calistenia", desc:"Sentadilla profunda sobre una sola pierna con la pierna opuesta extendida hacia el frente sin asistencia.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_saltos_a_cajon: { name:"Box Jumps", patron:"Sentadilla", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Salto pliométrico bipodal hacia plataforma elevada amortiguando con flexión suave de rodillas.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_plancha_abdominal: { name:"Plank", patron:"Core", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Isometría en antebrazos manteniendo el cuerpo en línea recta con glúteos y abdomen activos.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_plancha_superman: { name:"Superman Plank", patron:"Core", unilateral:"No", dificultad:4, twoKB:false, kind:"calistenia", desc:"Plancha con brazos extendidos hacia adelante por delante de la cabeza aumentando la palanca abdominal.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_plancha_lateral: { name:"Side Plank", patron:"Core", unilateral:"Si", dificultad:2, twoKB:false, kind:"calistenia", desc:"Apoyo sobre un solo antebrazo elevando cadera para activar oblicuos y estabilizadores de cadera.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_abdominales_sit_up: { name:"Sit-ups", patron:"Core", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Flexión completa de tronco desde el suelo hasta sentarse contrayendo la pared abdominal anterior.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_abdominales_v_up: { name:"V-ups", patron:"Core", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Elevación simultánea de tronco y piernas extendidas para juntar manos y pies en el punto alto en V.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_colgado_pies_a_la_barra: { name:"Hanging Toes to Bar", patron:"Core", unilateral:"No", dificultad:4, twoKB:false, kind:"calistenia", desc:"En barra fija, elevación estricta de piernas rectas hasta tocar la barra con la punta de los pies.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_extensiones_lumbares: { name:"Superman / Back Extensions", patron:"Bisagra", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Boca abajo en el suelo, extensión controlada de tronco y piernas activando la cadena posterior.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_escaladores: { name:"Mountain Climbers", patron:"Core", unilateral:"Si", dificultad:2, twoKB:false, kind:"calistenia", desc:"Desde posición de flexión, llevar rodillas alternadamente al pecho con ritmo continuo y core rígido.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_saltos_largos_potencia: { name:"Broad Jumps", patron:"Bisagra", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Salto horizontal explosivo con flexión de cadera y balanceo de brazos para máxima distancia.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_puente_de_gluteos: { name:"Glute Bridges", patron:"Bisagra", unilateral:"No", dificultad:1, twoKB:false, kind:"calistenia", desc:"Elevación de cadera en suelo contrayendo glúteos e isquiotibiales en extensión terminal.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_diamante: { name:"Diamond Push-ups", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Manos juntas formando un triángulo o diamante con pulgares e índices para aislar tríceps.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_en_pica: { name:"Pike Push-ups", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Posición en V invertida con cadera flexionada, empujando verticalmente para estimular hombros.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_arqueras: { name:"Archer Push-ups", patron:"Empuje", unilateral:"Si", dificultad:4, twoKB:false, kind:"calistenia", desc:"Flexión asimétrica desplazando el cuerpo hacia un brazo mientras el otro permanece recto.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_sentadilla_cosaca: { name:"Cossack Squats", patron:"Sentadilla", unilateral:"Si", dificultad:3, twoKB:false, kind:"calistenia", desc:"Sentadilla profunda lateral en plano frontal desarrollando fuerza unilateral y movilidad aductora.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_postura_hollow_body: { name:"Hollow Body Hold", patron:"Core", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Tensión isométrica básica de gimnasia con lumbares pegadas al suelo y extremidades extendidas.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_dominadas_australianas_anchas: { name:"Wide Grip Inverted Rows", patron:"Traccion", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Remo con autocarga y manos separadas para mayor trabajo del deltoides posterior y romboides.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_elevacion_rodillas_colgado: { name:"Hanging Knee Raises", patron:"Core", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Progresión hacia toes-to-bar flexionando rodillas hacia el pecho con control del balanceo.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_flexiones_pino_asistidas: { name:"Wall Handstand Push-ups", patron:"Empuje", unilateral:"No", dificultad:5, twoKB:false, kind:"calistenia", desc:"Vertical contra pared con flexión vertical de brazos, nivel avanzado de fuerza de hombros.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+cal_dominadas_arqueras: { name:"Archer Pull-ups", patron:"Traccion", unilateral:"Si", dificultad:5, twoKB:false, kind:"calistenia", desc:"Tracción unilateral asistida llevando el cuerpo hacia una mano con el brazo opuesto extendido.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
+};
+const CALISTHENICS_POOL = [
+"cal_flexiones_de_pecho",
+"cal_flexiones_inclinadas",
+"cal_flexiones_declinadas",
+"cal_fondos_en_paralelas",
+"cal_fondos_en_banco",
+"cal_flexiones_agarre_ancho",
+"cal_fondos_en_paralelas_pecho",
+"cal_dominadas_prono",
+"cal_dominadas_supino",
+"cal_dominadas_neutras",
+"cal_remo_autocarga",
+"cal_remo_autocarga_elevado",
+"cal_sentadillas_profundas",
+"cal_sentadillas_con_salto",
+"cal_avanzadas_estaticas",
+"cal_avanzadas_intercaladas",
+"cal_sentadillas_bulgaras",
+"cal_ascensos_a_cajon",
+"cal_elevacion_pantorrilla_doble",
+"cal_elevacion_pantorrilla_individual",
+"cal_sentadilla_pistol_asistida",
+"cal_sentadilla_pistol",
+"cal_saltos_a_cajon",
+"cal_plancha_abdominal",
+"cal_plancha_superman",
+"cal_plancha_lateral",
+"cal_abdominales_sit_up",
+"cal_abdominales_v_up",
+"cal_colgado_pies_a_la_barra",
+"cal_extensiones_lumbares",
+"cal_escaladores",
+"cal_saltos_largos_potencia",
+"cal_puente_de_gluteos",
+"cal_flexiones_diamante",
+"cal_flexiones_en_pica",
+"cal_flexiones_arqueras",
+"cal_sentadilla_cosaca",
+"cal_postura_hollow_body",
+"cal_dominadas_australianas_anchas",
+"cal_elevacion_rodillas_colgado",
+"cal_flexiones_pino_asistidas",
+"cal_dominadas_arqueras"
+];
+const CAL_REPS = {
+cal_flexiones_de_pecho:"x12",
+cal_flexiones_inclinadas:"x12",
+cal_flexiones_declinadas:"x12",
+cal_fondos_en_paralelas:"x12",
+cal_fondos_en_banco:"x12",
+cal_flexiones_agarre_ancho:"x12",
+cal_fondos_en_paralelas_pecho:"x12",
+cal_dominadas_prono:"x12",
+cal_dominadas_supino:"x12",
+cal_dominadas_neutras:"x12",
+cal_remo_autocarga:"x12",
+cal_remo_autocarga_elevado:"x12",
+cal_sentadillas_profundas:"x12",
+cal_sentadillas_con_salto:"x12",
+cal_avanzadas_estaticas:"x12",
+cal_avanzadas_intercaladas:"x12",
+cal_sentadillas_bulgaras:"x12",
+cal_ascensos_a_cajon:"x12",
+cal_elevacion_pantorrilla_doble:"x12",
+cal_elevacion_pantorrilla_individual:"x12",
+cal_sentadilla_pistol_asistida:"x12",
+cal_sentadilla_pistol:"x12",
+cal_saltos_a_cajon:"x12",
+cal_plancha_abdominal:"x30 seg",
+cal_plancha_superman:"x30 seg",
+cal_plancha_lateral:"x30 seg",
+cal_abdominales_sit_up:"x12",
+cal_abdominales_v_up:"x12",
+cal_colgado_pies_a_la_barra:"x12",
+cal_extensiones_lumbares:"x12",
+cal_escaladores:"x12",
+cal_saltos_largos_potencia:"x12",
+cal_puente_de_gluteos:"x30 seg",
+cal_flexiones_diamante:"x12",
+cal_flexiones_en_pica:"x12",
+cal_flexiones_arqueras:"x12",
+cal_sentadilla_cosaca:"x12",
+cal_postura_hollow_body:"x30 seg",
+cal_dominadas_australianas_anchas:"x12",
+cal_elevacion_rodillas_colgado:"x12",
+cal_flexiones_pino_asistidas:"x12",
+cal_dominadas_arqueras:"x12"
 };
 const POOLS = {
 core:            ["windmill","turkish_getup","russian_twist"],
 sentadilla:      ["goblet_squat","bulgarian_squat","cossack_squat","lunge_estatica","lunge_intercalada","step_up"],
-bisagra:         ["swing_dos_manos","swing_una_mano","deadlift_kb","figure_8","hip_thrust"],
+bisagra:         ["swing_dos_manos","swing_una_mano","deadlift_kb","figure_8","hip_thrust","iron_trident"],
 empuje:          ["press","push_press","press_jerk","floor_press","thruster","bench_press"],
-empuje_finisher: ["thruster","push_press","press_jerk"],
-core_movilidad:  ["windmill","turkish_getup","halo","deadlift_una_pierna","russian_twist"],
-jalon:           ["snatch","tiron_alto"],
-jalon_d3:        ["tiron_alto","snatch"],
-traccion:        ["gorilla_row","remo_una_mano","remo_dos_manos","pullover","renegade_row"],
 traccion_d4:     ["remo_una_mano","pullover","renegade_row","remo_dos_manos","gorilla_row"],
-sentadilla_uni:  ["lunge_intercalada","lunge_estatica","step_up","cossack_squat","bulgarian_squat"],
-sentadilla_uni_d3:["cossack_squat","bulgarian_squat","lunge_estatica","lunge_intercalada","step_up"],
-movilidad:       ["halo","deadlift_una_pierna"],
-bisagra_d3:      ["swing_una_mano","swing_dos_manos","deadlift_kb","figure_8","hip_thrust"],
-core_hold:       ["plancha","russian_twist"],
 empuje_d4:       ["push_press","press","press_jerk","bench_press","floor_press","thruster"],
 carga:           ["clean","farmer_walk"],
-core_d5:         ["russian_twist","windmill","figure_8"],
+movilidad:       ["halo","deadlift_una_pierna"],
+core_d5:         ["russian_twist","windmill","figure_8","iron_trident"],
+calistenia:      CALISTHENICS_POOL,
 };
 function pick(poolName, week, offset){
 const pool = POOLS[poolName];
 return pool[((week-1)+(offset||0)) % pool.length];
 }
+function calReps(slug){ return CAL_REPS[slug] || "x12"; }
 const GENERAL_WARMUP = [
 { name:"Neck Circles", reps:"10 reps", note:"Movimiento suave" },
 { name:"Shoulder Rolls", reps:"10 reps", note:"Adelante y atrás" },
@@ -320,86 +448,488 @@ const SUGGESTED_WEIGHTS = [
 { nivel:"Avanzado",     genero:"Mujer",  peso:"16 a 20 kg", nota:"Puede subir a 20kg si domina la técnica" },
 { nivel:"Avanzado",     genero:"Hombre", peso:"20 a 24 kg", nota:"Puede subir a 28kg si domina la técnica" },
 ];
-function buildDays(weekNum){
-const w = weekNum;
-return {
+const WEEK_PROGRAM = {
+1: {
 day1: {
-label:"Día 1", meta:"Resistencia — cadena posterior + fuerza",
+label:"Día 1", meta:"Resistencia — cadena posterior + Fuerza — cadena inferior + Fuerza — cadena posterior",
 warmup:{
-title:"Calentamiento", meta:"3 series · 60s descanso", restSeconds:60, rounds:3,
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex:"sentadillas_bw", reps:"x30" },
-{ ex: pick("core", w, 0), reps:"x5/5" },
-{ ex: pick("core", w, 1), reps:"x5/5" },
+{ ex:"sentadillas_bw", reps:"X30", sets:3, rest:60, tag:"Resistencia — cadena posterior" },
+{ ex:"windmill", reps:"x6/6", sets:3, rest:60, tag:"Core - activacion general" },
+{ ex:"turkish_getup", reps:"x3/3", sets:3, rest:60, tag:"Core - activacion general" }
 ]
 },
 main:{
-title:"Secuencia principal", meta:"3 bloques independientes, cada uno con sus propias series",
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
-{ ex: pick("sentadilla", w, 0), reps:"x15", sets:4, rest:45, tag:"Fuerza — cadena inferior" },
-{ ex: pick("bisagra", w, 0),    reps:"x20", sets:4, rest:60, tag:"Fuerza — cadena posterior" },
-{ ex: pick("empuje", w, 0),     reps:"x8/8", sets:3, rest:60, tag:"Fuerza — tren superior · ambos lados" },
+{ ex:"swing_una_mano", reps:"x10", sets:4, rest:60, tag:"Resistencia — cadena posterior" },
+{ ex:"goblet_squat", reps:"x15", sets:4, rest:45, tag:"Fuerza — cadena inferior" },
+{ ex:"swing_dos_manos", reps:"x20", sets:4, rest:60, tag:"Fuerza — cadena posterior" },
+{ ex:"press", reps:"x8/8", sets:3, rest:60, tag:"Fuerza - tren superior" }
 ]
 },
 finisher:{
-title:"Finalizador", meta:"2 series · 30s descanso · AMRAP alternando", restSeconds:30, rounds:2,
-moves:[ { ex: pick("empuje_finisher", w, 0), reps:"AMRAP" } ]
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"thruster", reps:"AMRAP", sets:2, rest:30, tag:"Resistencia a la fuerza - full body" },
+{ ex:"cal_flexiones_de_pecho", reps:"x12", sets:2, rest:30, tag:"Calistenia" }
+]
 }
 },
 day2: {
-label:"Día 2", meta:"Movilidad + fuerza tren inferior/superior",
+label:"Día 2", meta:"Fuerza - cadena inferior + Fuerza - tren superior",
 warmup:{
-title:"Calentamiento", meta:"2 series · 30s descanso", restSeconds:30, rounds:2,
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex: pick("core_movilidad", w, 0), reps:"x5/5" },
-{ ex:"farmer_walk", reps:"34 pasos (ida y vuelta)" },
+{ ex:"windmill", reps:"x5/5", sets:2, rest:30, tag:"Movilidad" },
+{ ex:"farmer_walk", reps:"25 metros (ida y vuelta)", sets:2, rest:30, tag:"Core - activacion general" }
 ]
 },
 main:{
-title:"Secuencia principal", meta:"2 bloques independientes, cada uno con sus propias series",
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
-{ ex: pick("jalon", w, 0),     reps:"x8/8", sets:5, rest:60, tag:"Fuerza — cadena inferior · alternando" },
-{ ex: pick("traccion", w, 0),  reps:"x20", sets:5, rest:60, tag:"Fuerza — tren superior · alternando" },
+{ ex:"snatch", reps:"x8/8", sets:5, rest:60, tag:"Fuerza - cadena inferior" },
+{ ex:"gorilla_row", reps:"x20", sets:5, rest:60, tag:"Fuerza - tren superior" }
 ]
 },
 finisher:{
-title:"Finalizador", meta:"3 series · 40s descanso", restSeconds:40, rounds:3,
-moves:[ { ex: pick("sentadilla_uni", w, 0), reps:"x12" } ]
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"lunge_intercalada", reps:"x12", sets:3, rest:40, tag:"Resistencia - tren inferior" },
+{ ex:"cal_flexiones_inclinadas", reps:"x12", sets:3, rest:40, tag:"Calistenia" }
+]
 }
 },
 day3: {
-label:"Día 3", meta:"Movilidad + resistencia + hipertrofia",
+label:"Día 3", meta:"Resistencia - cadena posterior + Resistencia - cadena posterior + Hipertrofia - tren superior",
 warmup:{
-title:"Calentamiento", meta:"4 series · 30s descanso", restSeconds:30, rounds:4,
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex: pick("movilidad", w, 0), reps:"x10" },
-{ ex: pick("movilidad", w, 1), reps:"x5/5" },
+{ ex:"halo", reps:"x10", sets:4, rest:30, tag:"Movilidad" },
+{ ex:"deadlift_una_pierna", reps:"x5/5", sets:4, rest:30, tag:"Movilidad" }
 ]
 },
 main:{
-title:"Secuencia principal", meta:"3 bloques independientes, cada uno con sus propias series",
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
-{ ex: pick("bisagra_d3", w, 0),      reps:"x15/15", sets:4, rest:60, tag:"Resistencia — cadena posterior · alternando" },
-{ ex: pick("jalon_d3", w, 0),         reps:"x10/10", sets:4, rest:60, tag:"Resistencia — cadena posterior · alternando" },
-{ ex: pick("sentadilla_uni_d3", w, 0),reps:"x10/10", sets:4, rest:60, tag:"Hipertrofia — tren superior · alternando" },
+{ ex:"swing_una_mano", reps:"x15/15", sets:4, rest:60, tag:"Resistencia - cadena posterior" },
+{ ex:"tiron_alto", reps:"x10/10", sets:4, rest:60, tag:"Resistencia - cadena posterior" },
+{ ex:"cossack_squat", reps:"x10/10", sets:4, rest:60, tag:"Hipertrofia - tren superior" }
 ]
 },
 finisher:{
-title:"Finalizador", meta:"2 series · 90s descanso", restSeconds:90, rounds:2,
-moves:[ { ex: pick("core_hold", w, 0), reps:"x90 segundos" } ]
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"plancha", reps:"x90 segundos", sets:2, rest:90, tag:"Core - activacion general" },
+{ ex:"cal_flexiones_declinadas", reps:"x12", sets:2, rest:90, tag:"Calistenia" }
+]
+}
 }
 },
-day4: {
-label:"Día 4", meta:"Fuerza funcional — tracción + empuje + carga",
+2: {
+day1: {
+label:"Día 1", meta:"Hipertrofia - tren superior + Hipertrofia - tren superior",
 warmup:{
-title:"Calentamiento", meta:"2 series · 30s descanso", restSeconds:30, rounds:2,
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex: pick("core", w, 2), reps:"x5/5" },
-{ ex: pick("movilidad", w, 1), reps:"x10" },
+{ ex:"deadlift_kb", reps:"x12", sets:3, rest:45, tag:"Movilidad" },
+{ ex:"farmer_walk", reps:"x90 segundos por lado", sets:3, rest:90, tag:"Movilidad" }
 ]
 },
 main:{
-title:"Secuencia principal", meta:"3 bloques independientes, cada uno con sus propias series",
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"renegade_row", reps:"x30 (1x1) intercalado", sets:5, rest:90, tag:"Hipertrofia - tren superior" },
+{ ex:"snatch", reps:"x6/6", sets:5, rest:90, tag:"Hipertrofia - tren superior" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"figure_8", reps:"x10/10", sets:4, rest:60, tag:"Resistencia - cadena posterior" },
+{ ex:"cal_fondos_en_paralelas", reps:"x12", sets:4, rest:60, tag:"Calistenia" }
+]
+}
+},
+day2: {
+label:"Día 2", meta:"Resistencia - cadena inferior + Fuerza - cadena posterior",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"iron_trident", reps:"x20", sets:4, rest:30, tag:"Movilidad" },
+{ ex:"goblet_squat", reps:"x20", sets:5, rest:30, tag:"Movilidad" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"lunge_intercalada", reps:"x30", sets:5, rest:45, tag:"Resistencia - cadena inferior" },
+{ ex:"deadlift_una_pierna", reps:"x10/10", sets:4, rest:45, tag:"Fuerza - cadena posterior" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"clean", reps:"x15/15", sets:5, rest:60, tag:"Resistencia a la fuerza - cadena posterior" },
+{ ex:"cal_fondos_en_banco", reps:"x12", sets:5, rest:60, tag:"Calistenia" }
+]
+}
+},
+day3: {
+label:"Día 3", meta:"Fuerza - cadena superior + Core - activacion general + Resistencia a la fuerza - cadena posterior",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"step_up", reps:"x12/12", sets:4, rest:30, tag:"Movilidad" },
+{ ex:"swing_una_mano", reps:"x10/10", sets:3, rest:30, tag:"Movilidad" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"push_press", reps:"x6/6", sets:5, rest:45, tag:"Fuerza - cadena superior" },
+{ ex:"turkish_getup", reps:"x5/5", sets:5, rest:45, tag:"Core - activacion general" },
+{ ex:"tiron_alto", reps:"x10", sets:5, rest:45, tag:"Resistencia a la fuerza - cadena posterior" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"tiron_alto", reps:"AMRAP", sets:2, rest:30, tag:"Finalizador" },
+{ ex:"cal_flexiones_agarre_ancho", reps:"x12", sets:2, rest:30, tag:"Calistenia" }
+]
+}
+}
+},
+3: {
+day1: {
+label:"Día 1", meta:"Fuerza — cadena posterior + Fuerza — tren superior + Fuerza — tren inferior",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"halo", reps:"x10", sets:3, rest:30, tag:"Movilidad y activacion" },
+{ ex:"windmill", reps:"x6/6", sets:3, rest:45, tag:"Core y estabilidad" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"deadlift_kb", reps:"x12", sets:4, rest:60, tag:"Fuerza — cadena posterior" },
+{ ex:"press", reps:"x8/8", sets:4, rest:60, tag:"Fuerza — tren superior" },
+{ ex:"goblet_squat", reps:"x12", sets:4, rest:60, tag:"Fuerza — tren inferior" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"farmer_walk", reps:"40 metros por lado", sets:3, rest:45, tag:"Resistencia — core y estabilidad" },
+{ ex:"cal_fondos_en_paralelas_pecho", reps:"x12", sets:3, rest:45, tag:"Calistenia" }
+]
+}
+},
+day2: {
+label:"Día 2", meta:"Traccion — tren superior + Fuerza unilateral — piernas + Bisagra y potencia",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"iron_trident", reps:"x15", sets:3, rest:30, tag:"Movilidad articular" },
+{ ex:"deadlift_una_pierna", reps:"x6/6", sets:3, rest:30, tag:"Activacion isometrica" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"remo_una_mano", reps:"x10/10", sets:4, rest:60, tag:"Traccion — tren superior" },
+{ ex:"lunge_estatica", reps:"x10/10", sets:4, rest:60, tag:"Fuerza unilateral — piernas" },
+{ ex:"swing_dos_manos", reps:"x20", sets:4, rest:60, tag:"Bisagra y potencia" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"russian_twist", reps:"x20", sets:3, rest:30, tag:"Core dinamico" },
+{ ex:"cal_dominadas_prono", reps:"x12", sets:3, rest:30, tag:"Calistenia" }
+]
+}
+},
+day3: {
+label:"Día 3", meta:"Empuje horizontal + Patron bisagra unilateral + Traccion dinamica",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"halo", reps:"x12", sets:3, rest:30, tag:"Movilidad de hombros y cadera" },
+{ ex:"turkish_getup", reps:"x3/3", sets:3, rest:45, tag:"Control postural global" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"floor_press", reps:"x10/10", sets:4, rest:60, tag:"Empuje horizontal" },
+{ ex:"hip_thrust", reps:"x15", sets:4, rest:60, tag:"Patron bisagra unilateral" },
+{ ex:"tiron_alto", reps:"x10/10", sets:4, rest:60, tag:"Traccion dinamica" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"thruster", reps:"x12", sets:3, rest:45, tag:"Acondicionamiento metabolico" },
+{ ex:"cal_dominadas_supino", reps:"x12", sets:3, rest:45, tag:"Calistenia" }
+]
+}
+}
+},
+4: {
+day1: {
+label:"Día 1", meta:"Potencia y cadena posterior + Traccion bilateral pesada + Empuje vertical de potencia",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"halo", reps:"x12", sets:3, rest:30, tag:"Movilidad articular y cintura escapular" },
+{ ex:"deadlift_una_pierna", reps:"x6/6", sets:3, rest:45, tag:"Activacion de bisagra y core" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"swing_una_mano", reps:"x12/12", sets:4, rest:60, tag:"Potencia y cadena posterior" },
+{ ex:"remo_dos_manos", reps:"x12", sets:4, rest:60, tag:"Traccion bilateral pesada" },
+{ ex:"push_press", reps:"x8/8", sets:4, rest:60, tag:"Empuje vertical de potencia" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"figure_8", reps:"x12/12", sets:3, rest:30, tag:"Resistencia metabolica y bisagra" },
+{ ex:"cal_dominadas_neutras", reps:"x12", sets:3, rest:30, tag:"Calistenia" }
+]
+}
+},
+day2: {
+label:"Día 2", meta:"Potencia balistica — jalon + Fuerza tren inferior + Traccion horizontal explosiva",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"iron_trident", reps:"x15", sets:3, rest:30, tag:"Movilidad toracica y cadera" },
+{ ex:"windmill", reps:"x5/5", sets:3, rest:45, tag:"Estabilidad escapular y core" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"clean", reps:"x8/8", sets:5, rest:60, tag:"Potencia balistica — jalon" },
+{ ex:"bulgarian_squat", reps:"x8/8", sets:4, rest:60, tag:"Fuerza tren inferior" },
+{ ex:"gorilla_row", reps:"x16", sets:4, rest:60, tag:"Traccion horizontal explosiva" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"farmer_walk", reps:"50 metros por lado", sets:3, rest:45, tag:"Resistencia a la fatiga — core" },
+{ ex:"cal_remo_autocarga", reps:"x12", sets:3, rest:45, tag:"Calistenia" }
+]
+}
+},
+day3: {
+label:"Día 3", meta:"Jalon balistico de alta velocidad + Empuje plano y traccion + Fuerza dinamica tren inferior",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"goblet_squat", reps:"x12", sets:3, rest:30, tag:"Movilidad de tobillo y cadera" },
+{ ex:"step_up", reps:"x10/10", sets:3, rest:30, tag:"Activacion neuromuscular" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"tiron_alto", reps:"x12/12", sets:4, rest:60, tag:"Jalon balistico de alta velocidad" },
+{ ex:"bench_press", reps:"x10", sets:4, rest:60, tag:"Empuje plano y traccion" },
+{ ex:"lunge_intercalada", reps:"x20", sets:4, rest:60, tag:"Fuerza dinamica tren inferior" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"thruster", reps:"x15", sets:3, rest:45, tag:"Potencia y acondicionamiento full body" },
+{ ex:"cal_remo_autocarga_elevado", reps:"x12", sets:3, rest:45, tag:"Calistenia" }
+]
+}
+}
+},
+5: {
+day1: {
+label:"Día 1", meta:"Potencia neuromuscular unilateral + Traccion horizontal y estabilidad de core + Fuerza frontal asimetrica",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"halo", reps:"x12", sets:3, rest:30, tag:"Movilidad articular y control de hombros" },
+{ ex:"deadlift_una_pierna", reps:"x8/8", sets:3, rest:45, tag:"Activacion unilateral de bisagra" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"snatch", reps:"x8/8", sets:5, rest:60, tag:"Potencia neuromuscular unilateral" },
+{ ex:"renegade_row", reps:"x16", sets:4, rest:60, tag:"Traccion horizontal y estabilidad de core" },
+{ ex:"cossack_squat", reps:"x8/8", sets:4, rest:60, tag:"Fuerza frontal asimetrica" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"russian_twist", reps:"x24", sets:3, rest:30, tag:"Control rotacional y resistencia de core" },
+{ ex:"cal_sentadillas_profundas", reps:"x12", sets:3, rest:30, tag:"Calistenia" }
+]
+}
+},
+day2: {
+label:"Día 2", meta:"Complejo tecnico balistico + Empuje estricto unilateral + Fuerza unilateral pierna",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"iron_trident", reps:"x20", sets:3, rest:30, tag:"Movilidad de columna y pelvis" },
+{ ex:"hip_thrust", reps:"x15", sets:3, rest:30, tag:"Activacion dinamica de cadera" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"clean", reps:"x8/8", sets:5, rest:60, tag:"Complejo tecnico balistico" },
+{ ex:"press", reps:"x6/6", sets:4, rest:60, tag:"Empuje estricto unilateral" },
+{ ex:"bulgarian_squat", reps:"x10/10", sets:4, rest:60, tag:"Fuerza unilateral pierna" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"farmer_walk", reps:"50 metros por lado", sets:3, rest:45, tag:"Carga asimetrica y estabilidad" },
+{ ex:"cal_sentadillas_con_salto", reps:"x12", sets:3, rest:45, tag:"Calistenia" }
+]
+}
+},
+day3: {
+label:"Día 3", meta:"Control postural bajo carga maxima + Empuje y recepcion explosiva + Traccion profunda dorsal",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"windmill", reps:"x6/6", sets:3, rest:30, tag:"Movilidad glenohumeral y core" },
+{ ex:"step_up", reps:"x12/12", sets:3, rest:30, tag:"Activacion neuromuscular pliometrica" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"turkish_getup", reps:"x4/4", sets:4, rest:60, tag:"Control postural bajo carga maxima" },
+{ ex:"press_jerk", reps:"x6/6", sets:4, rest:60, tag:"Empuje y recepcion explosiva" },
+{ ex:"pullover", reps:"x12", sets:4, rest:60, tag:"Traccion profunda dorsal" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"swing_una_mano", reps:"x15/15", sets:4, rest:30, tag:"Capacidad anaerobica y bisagra" },
+{ ex:"cal_avanzadas_estaticas", reps:"x12", sets:4, rest:30, tag:"Calistenia" }
+]
+}
+}
+},
+6: {
+day1: {
+label:"Día 1", meta:"Fuerza maxima — bisagra + Empuje overhead de precision + Potencia balistica y velocidad",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"halo", reps:"x12", sets:3, rest:30, tag:"Movilidad articular integral" },
+{ ex:"deadlift_una_pierna", reps:"x8/8", sets:3, rest:45, tag:"Activacion de bisagra posterior" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"deadlift_kb", reps:"x10", sets:5, rest:60, tag:"Fuerza maxima — bisagra" },
+{ ex:"press_jerk", reps:"x8/8", sets:4, rest:60, tag:"Empuje overhead de precision" },
+{ ex:"swing_dos_manos", reps:"x25", sets:4, rest:60, tag:"Potencia balistica y velocidad" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"thruster", reps:"x15", sets:3, rest:45, tag:"Resistencia metabolica y capacidad de trabajo" },
+{ ex:"cal_avanzadas_intercaladas", reps:"x12", sets:3, rest:45, tag:"Calistenia" }
+]
+}
+},
+day2: {
+label:"Día 2", meta:"Potencia olimpica de kettlebell + Traccion horizontal intensa + Fuerza y estabilidad unilateral pierna",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"iron_trident", reps:"x20", sets:3, rest:30, tag:"Movilidad toracica y cadera" },
+{ ex:"windmill", reps:"x6/6", sets:3, rest:45, tag:"Control rotacional y core" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"snatch", reps:"x10/10", sets:5, rest:60, tag:"Potencia olimpica de kettlebell" },
+{ ex:"renegade_row", reps:"x20", sets:4, rest:60, tag:"Traccion horizontal intensa" },
+{ ex:"bulgarian_squat", reps:"x10/10", sets:4, rest:60, tag:"Fuerza y estabilidad unilateral pierna" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"figure_8", reps:"x15/15", sets:3, rest:30, tag:"Acondicionamiento de bisagra y rotacion" },
+{ ex:"cal_sentadillas_bulgaras", reps:"x12", sets:3, rest:30, tag:"Calistenia" }
+]
+}
+},
+day3: {
+label:"Día 3", meta:"Maestria tecnica y estabilidad total + Traccion y potencia balistica + Fuerza y control lateral",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex:"goblet_squat", reps:"x15", sets:3, rest:30, tag:"Movilidad profunda de cadera" },
+{ ex:"step_up", reps:"x12/12", sets:3, rest:30, tag:"Activacion isometrica y neuromuscular" }
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
+moves:[
+{ ex:"turkish_getup", reps:"x5/5", sets:4, rest:60, tag:"Maestria tecnica y estabilidad total" },
+{ ex:"clean", reps:"x10/10", sets:5, rest:60, tag:"Traccion y potencia balistica" },
+{ ex:"cossack_squat", reps:"x10/10", sets:4, rest:60, tag:"Fuerza y control lateral" }
+]
+},
+finisher:{
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"farmer_walk", reps:"60 metros por lado", sets:4, rest:45, tag:"Resistencia de agarre y core asimetrico" },
+{ ex:"cal_ascensos_a_cajon", reps:"x12", sets:4, rest:45, tag:"Calistenia" }
+]
+}
+}
+},
+};
+function levelForWeek(w){
+if (w < 3) return "Principiante";
+if (w < 6) return "Intermedio";
+return "Avanzado";
+}
+function buildExtraDays(weekNum){
+const w = weekNum;
+return {
+day4: {
+label:"Día 4", meta:"Fuerza funcional — tracción + empuje + carga",
+warmup:{
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
+moves:[
+{ ex: pick("core", w, 2), reps:"x5/5", sets:2, rest:30, tag:"Activación" },
+{ ex: pick("movilidad", w, 1), reps:"x10", sets:2, rest:30, tag:"Movilidad" },
+]
+},
+main:{
+title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
 { ex: pick("traccion_d4", w, 0), reps:"x10/10", sets:4, rest:60, tag:"Fuerza — tracción · alternando" },
 { ex: pick("empuje_d4", w, 0),   reps:"x8/8", sets:4, rest:60, tag:"Fuerza — empuje · alternando" },
@@ -407,33 +937,59 @@ moves:[
 ]
 },
 finisher:{
-title:"Finalizador", meta:"2 series · 30s descanso · AMRAP", restSeconds:30, rounds:2,
-moves:[ { ex: pick("bisagra", w, 2), reps:"AMRAP" } ]
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex: pick("bisagra", w, 2), reps:"AMRAP", sets:2, rest:30, tag:"Kettlebell" },
+{ ex: pick("calistenia", w, 5), reps: calReps(pick("calistenia", w, 5)), sets:2, rest:30, tag:"Calistenia" },
+]
 }
 },
 day5: {
 label:"Día 5", meta:"Opcional — movilidad y core (desde semana 5)", optional:true, minWeek:5,
 warmup:{
-title:"Calentamiento", meta:"1 serie · 30s descanso", restSeconds:30, rounds:1,
+title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex: pick("movilidad", w, 0), reps:"x10" },
+{ ex: pick("movilidad", w, 0), reps:"x10", sets:2, rest:30, tag:"Movilidad" },
 ]
 },
 main:{
-title:"Secuencia principal (ligera)", meta:"2 bloques independientes, cada uno con sus propias series",
+title:"Secuencia principal (ligera)", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
 { ex: pick("core_d5", w, 0), reps:"x12", sets:3, rest:45, tag:"Core / estabilidad" },
 { ex:"farmer_walk", reps:"20 pasos por lado", sets:3, rest:45, tag:"Carga ligera" },
 ]
 },
 finisher:{
-title:"Finalizador", meta:"1 serie · 60s descanso", restSeconds:60, rounds:1,
-moves:[ { ex:"plancha", reps:"x60 segundos" } ]
+title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
+moves:[
+{ ex:"plancha", reps:"x60 segundos", sets:1, rest:30, tag:"Kettlebell / core" },
+{ ex: pick("calistenia", w, 9), reps: calReps(pick("calistenia", w, 9)), sets:1, rest:30, tag:"Calistenia" },
+]
 }
 }
 };
 }
-const PROGRESS_KEY = 'hierro_kova_progress_v1';
+function buildDays(weekNum){
+const w = weekNum;
+let coreDays;
+if (w <= 6){
+coreDays = JSON.parse(JSON.stringify(WEEK_PROGRAM[w]));
+} else {
+const baseWeek = ((w - 7) % 6) + 1;
+coreDays = JSON.parse(JSON.stringify(WEEK_PROGRAM[baseWeek]));
+const setsBump = w <= 9 ? 1 : 2;
+const restCut  = w <= 9 ? 10 : 20;
+["day1","day2","day3"].forEach(dk=>{
+const day = coreDays[dk];
+day.meta = day.meta + " · Ciclo 2 (Avanzado)";
+day.main.moves.forEach(m=>{ m.sets = m.sets + setsBump; m.rest = Math.max(30, m.rest - restCut); });
+day.warmup.moves.forEach(m=>{ m.rest = Math.max(20, m.rest - Math.floor(restCut/2)); });
+day.finisher.moves.forEach(m=>{ m.rest = Math.max(20, m.rest - Math.floor(restCut/2)); });
+});
+}
+return Object.assign(coreDays, buildExtraDays(w));
+}
+const PROGRESS_KEY = 'hierro_kova_progress_v2';
 function loadProgress(){
 try{
 const raw = localStorage.getItem(PROGRESS_KEY);
@@ -477,11 +1033,13 @@ return streak;
 }
 function updateStreakUI(){
 const el = document.getElementById('streakBadge');
-if (el) el.textContent = `🔥 ${computeStreak()} día${computeStreak()===1?'':'s'} de racha`;
+const s = computeStreak();
+if (el) el.textContent = `🔥 ${s} día${s===1?'':'s'} de racha`;
 }
 let currentWeek = 1;
 let currentDayKey = "day1";
 let currentMoveRef = null;
+let timerPhase = "rest";        // "rest" es la única fase automática (la serie/repetición la marca el usuario a su ritmo)
 let secondsLeft = 60;
 let phaseTotal = 60;
 let currentRoundNow = 1;
@@ -509,7 +1067,7 @@ for (let w=1; w<=12; w++){
 const btn = document.createElement('button');
 btn.className = 'week-btn' + (w===currentWeek ? ' active':'');
 btn.textContent = w;
-btn.addEventListener('click', ()=>{ currentWeek = w; refreshAll(); });
+btn.addEventListener('click', ()=>{ currentWeek = w; currentMoveRef = null; refreshAll(); });
 weekStrip.appendChild(btn);
 }
 }
@@ -532,6 +1090,12 @@ if (currentDayKey === "day5" && currentWeek < 5){
 currentDayKey = "day1";
 }
 }
+function blockExecNote(blockKey){
+if (blockKey === "main"){
+return "Series rectas: completa TODAS las series de este ejercicio (con su descanso) antes de pasar al siguiente de la lista.";
+}
+return "Circuito: haz una serie de cada ejercicio de este bloque en orden, descansa, y repite hasta completar las rondas de cada uno.";
+}
 function renderBlocks(day){
 blocksContainer.innerHTML = "";
 ["warmup","main","finisher"].forEach(blockKey=>{
@@ -543,7 +1107,8 @@ block.moves.forEach((m,i)=>{
 const ex = EXERCISES[m.ex];
 const isActive = currentMoveRef && currentMoveRef.blockKey===blockKey && currentMoveRef.moveIndex===i;
 const setsRest = (m.sets!==undefined && m.rest!==undefined) ? ` · ${m.sets}x · ${m.rest}s desc` : '';
-const tagLine = m.tag ? `<span class="move-tag">${m.tag}</span>` : '';
+const kindTag = ex.kind === "calistenia" ? '<span class="move-tag">Calistenia</span>' : '';
+const tagLine = m.tag ? `<span class="move-tag">${m.tag}</span>` : kindTag;
 movesHtml += `<div class="move-item${isActive?' active':''}" data-block="${blockKey}" data-index="${i}">
 <span class="move-name">${ex.name}${ex.twoKB ? ' <em>(2 KB)</em>' : ''}${tagLine}</span>
 <span class="move-reps">${m.reps}${setsRest}</span>
@@ -553,7 +1118,7 @@ div.innerHTML = `
 <div class="block-title">${block.title}</div>
 <div class="block-meta">${block.meta}</div>
 <div class="move-list">${movesHtml}</div>
-${block.note ? `<div class="block-note">${block.note}</div>` : ""}
+<div class="block-note">${blockExecNote(blockKey)}</div>
 `;
 blocksContainer.appendChild(div);
 });
@@ -576,25 +1141,27 @@ vName.textContent = ex.name;
 const tagPart = move.tag ? `${move.tag} · ` : '';
 vTag.textContent = `${tagPart}${move.reps}`;
 const difDots = "●".repeat(ex.dificultad) + "○".repeat(5-ex.dificultad);
-const metaLine = `Patrón: ${ex.patron} · Dificultad ${difDots} · ${ex.unilateral==="Si" ? "Unilateral" : ex.unilateral==="Ambos" ? "Uni o bilateral" : "Bilateral"}${ex.twoKB ? " · requiere 2 kettlebells" : ""}`;
+const kindLabel = ex.kind === "calistenia" ? "Calistenia (peso corporal)" : "Kettlebell";
+const metaLine = `${kindLabel} · Patrón: ${ex.patron} · Dificultad ${difDots} · ${ex.unilateral==="Si" ? "Unilateral" : ex.unilateral==="Ambos" ? "Uni o bilateral" : "Bilateral"}${ex.twoKB ? " · requiere 2 kettlebells" : ""}`;
 const descPart = ex.desc ? `<br><br><b>Cómo se hace:</b> ${ex.desc}` : '';
 const cuePart = ex.cue ? `<br><br><b>Evita:</b> ${ex.cue}` : '';
 vNote.innerHTML = `${metaLine}${descPart}${cuePart}`;
 stopTimer();
-phaseTotal = (move.rest !== undefined ? move.rest : block.restSeconds) || 60;
+phaseTotal = move.rest || 60;
 secondsLeft = phaseTotal;
 currentRoundNow = 1;
-currentRoundTotal = (move.sets !== undefined ? move.sets : block.rounds) || 1;
-dialPhase.textContent = blockKey === "finisher" ? "RITMO / DESCANSO" : blockKey === "main" ? "DESCANSO" : "TRANSICIÓN";
+currentRoundTotal = move.sets || 1;
+dialPhase.textContent = "DESCANSO";
 updateDial();
 renderBlocks(day);
 }
 function updateDial(){
 dialTime.textContent = secondsLeft;
-roundTrack.innerHTML = `Ronda <b>${currentRoundNow}</b> / ${currentRoundTotal}`;
-const fraction = secondsLeft / phaseTotal;
+roundTrack.innerHTML = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — descansa <b>${phaseTotal}s</b> entre series`;
+const fraction = phaseTotal > 0 ? secondsLeft / phaseTotal : 0;
 dialFill.style.strokeDasharray = CIRC;
 dialFill.style.strokeDashoffset = CIRC * (1 - fraction);
+dialTime.classList.toggle('dial-urgent', secondsLeft <= 5);
 }
 function getFlatMoves(day){
 const flat = [];
@@ -603,21 +1170,36 @@ day[bk].moves.forEach((m,i)=> flat.push({ blockKey:bk, index:i }));
 });
 return flat;
 }
-function beep(){
+let audioCtx = null;
+function getAudioCtx(){
+if (!audioCtx){
+try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; }
+}
+return audioCtx;
+}
+function tone(freq, dur, vol){
+const ctx = getAudioCtx();
+if (!ctx) return;
 try{
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
 const osc = ctx.createOscillator();
 const gain = ctx.createGain();
 osc.connect(gain); gain.connect(ctx.destination);
-osc.frequency.value = 880;
-gain.gain.setValueAtTime(0.15, ctx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-osc.start(); osc.stop(ctx.currentTime + 0.4);
-}catch(e){  }
+osc.frequency.value = freq;
+gain.gain.setValueAtTime(vol, ctx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+osc.start(); osc.stop(ctx.currentTime + dur);
+}catch(e){ }
+}
+function tickBeep(){
+tone(660, 0.12, 0.12);
+if (navigator.vibrate) navigator.vibrate(40);
+}
+function transitionBeep(){
+tone(880, 0.4, 0.16);
 if (navigator.vibrate) navigator.vibrate(200);
 }
 function advanceToNextMove(){
-beep();
+transitionBeep();
 const days = buildDays(currentWeek);
 const day = days[currentDayKey];
 const flat = getFlatMoves(day);
@@ -635,12 +1217,16 @@ startTimer();
 }
 function tick(){
 secondsLeft--;
+if (secondsLeft >= 1 && secondsLeft <= 5){
+tickBeep();
+}
 if (secondsLeft < 0){
 currentRoundNow++;
 if (currentRoundNow > currentRoundTotal){
 advanceToNextMove();
 return;
 }
+transitionBeep();
 secondsLeft = phaseTotal;
 }
 updateDial();
@@ -653,7 +1239,7 @@ timerHandle = setInterval(tick, 1000);
 }
 function stopTimer(){
 running = false;
-playBtn.textContent = "Iniciar";
+playBtn.textContent = "Iniciar descanso";
 clearInterval(timerHandle);
 }
 function resetTimer(){
@@ -677,7 +1263,8 @@ gGrid.innerHTML = GENERAL_WARMUP.map(g=>
 renderStaticSections();
 function refreshAll(){
 const days = buildDays(currentWeek);
-document.getElementById('blockNotice').innerHTML = `<b>Semana ${currentWeek}</b> · los ejercicios de cada patrón rotan semana a semana (nunca dos semanas seguidas repiten la misma selección) · series y descanso son los que Norman definió para cada bloque`;
+const level = levelForWeek(currentWeek);
+document.getElementById('blockNotice').innerHTML = `<b>Semana ${currentWeek} · Nivel ${level}</b> — Días 1-3: ejercicios tal cual los definió Norman para esta semana (varían día a día y semana a semana, sin repetir). Día 4 y Día 5 (opcional, desde semana 5): mismos movimientos de la biblioteca, rotando por semana. Cada finalizador combina al menos un ejercicio de kettlebell y uno de calistenia.`;
 renderWeekStrip();
 renderDayTabs(days);
 renderBlocks(days[currentDayKey]);
