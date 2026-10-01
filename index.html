@@ -195,10 +195,15 @@
           <div class="dial-phase" id="dialPhase">DESCANSO</div>
         </div>
       </div>
-      <div class="round-track" id="roundTrack">Serie <b>1</b> / 4</div>
+      <div class="round-track" id="roundTrack">Selecciona un día y pulsa "Iniciar entrenamiento"</div>
       <div class="controls">
-        <button class="ctrl-btn primary" id="playBtn">Iniciar</button>
-        <button class="ctrl-btn" id="resetBtn">Reiniciar</button>
+        <button class="ctrl-btn primary" id="startBtn">▶ Iniciar entrenamiento</button>
+        <button class="ctrl-btn primary" id="playBtn" style="display:none;">Pausar</button>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn" id="skipBtn" style="display:none;">Saltar ▶▶</button>
+        <button class="ctrl-btn" id="stopSessionBtn" style="display:none;">Detener</button>
+        <button class="ctrl-btn" id="resetBtn">Reiniciar paso</button>
       </div>
       <button class="ctrl-btn done-btn" id="doneBtn">✓ Marcar día completo</button>
     </div>
@@ -208,12 +213,12 @@
         <div class="v-name" id="vName">—</div>
         <div class="v-tag" id="vTag">—</div>
       </div>
-      <div class="v-note" id="vNote">Selecciona un ejercicio de la lista para verlo aquí. Si el ejercicio es por tiempo (ej. "x90 segundos"), pulsa Iniciar y el contador hace solo el trabajo y el descanso, ronda tras ronda. Si es por repeticiones, haz tu serie a tu ritmo y pulsa "Iniciar descanso" al terminarla. Suena 5-4-3-2-1 antes de cada cambio.</div>
+      <div class="v-note" id="vNote">Revisa los bloques de abajo (toca un ejercicio para ver cómo se hace). Cuando estés listo, pulsa "Iniciar entrenamiento": te va mostrando cada ejercicio con su contador de trabajo, y el descanso que corresponda entre series, rondas o bloques — todo automático, con beep 5-4-3-2-1 antes de cada cambio.</div>
     </div>
   </div>
 
   <footer>
-    Toca cualquier ejercicio para ver sus datos técnicos · Ejercicios por tiempo: el contador hace trabajo + descanso solo · Ejercicios por repeticiones: pulsa "Iniciar descanso" después de cada serie · Beep 5-4-3-2-1 antes de cada cambio<br>
+    Toca cualquier ejercicio para ver sus datos técnicos antes de empezar · "Iniciar entrenamiento" arranca la sesión guiada completa del día (calentamiento → principal → finalizador), un contador de trabajo y descanso a la vez · Beep 5-4-3-2-1 antes de cada cambio<br>
     Metodología y taxonomía de movimientos: Norman (KOVA) — Entregable_Norman_1.xlsx · Progresión de 12 semanas inspirada en el programa Kaizen Kettlebell
   </footer>
 </div>
@@ -1039,13 +1044,8 @@ if (el) el.textContent = `🔥 ${s} día${s===1?'':'s'} de racha`;
 let currentWeek = 1;
 let currentDayKey = "day1";
 let currentMoveRef = null;
-let timerPhase = "ready-rest";  // "ready-work" | "work" | "ready-rest" | "rest"
-let currentMoveRest = 60;
-let currentWorkSeconds = 0;     // >0 si el ejercicio actual tiene una duración de trabajo cronometrada
 let secondsLeft = 60;
 let phaseTotal = 60;
-let currentRoundNow = 1;
-let currentRoundTotal = 1;
 let timerHandle = null;
 let running = false;
 const weekStrip = document.getElementById('weekStrip');
@@ -1061,6 +1061,9 @@ const vNote = document.getElementById('vNote');
 const playBtn = document.getElementById('playBtn');
 const resetBtn = document.getElementById('resetBtn');
 const doneBtn = document.getElementById('doneBtn');
+const startBtn = document.getElementById('startBtn');
+const skipBtn = document.getElementById('skipBtn');
+const stopSessionBtn = document.getElementById('stopSessionBtn');
 doneBtn.addEventListener('click', markCurrentDayComplete);
 const CIRC = 2 * Math.PI * 88;
 function renderWeekStrip(){
@@ -1094,9 +1097,9 @@ currentDayKey = "day1";
 }
 function blockExecNote(blockKey){
 if (blockKey === "main"){
-return "Series rectas: completa TODAS las series de este ejercicio (con su descanso) antes de pasar al siguiente de la lista.";
+return "Series rectas: cada ejercicio se hace entero (todas sus series, con descanso entre ellas) antes de pasar al siguiente.";
 }
-return "Circuito: haz una serie de cada ejercicio de este bloque en orden, descansa, y repite hasta completar las rondas de cada uno.";
+return "Circuito: en cada ronda se hace una serie de cada ejercicio del bloque, uno tras otro; al completar todas las rondas, descanso y siguiente bloque.";
 }
 function renderBlocks(day){
 blocksContainer.innerHTML = "";
@@ -1128,7 +1131,7 @@ blocksContainer.querySelectorAll('.move-item').forEach(item=>{
 item.addEventListener('click', ()=>{
 const blockKey = item.getAttribute('data-block');
 const index = parseInt(item.getAttribute('data-index'));
-selectMove(blockKey, index);
+previewMove(blockKey, index);
 });
 });
 }
@@ -1141,53 +1144,43 @@ m = s.match(/(\d+)\s*min/i);
 if (m) return parseInt(m[1],10) * 60;
 return 0;
 }
-function selectMove(blockKey, index){
-currentMoveRef = { blockKey, moveIndex:index };
-const days = buildDays(currentWeek);
-const day = days[currentDayKey];
-const block = day[blockKey];
-const move = block.moves[index];
-const ex = EXERCISES[move.ex];
-vName.textContent = ex.name;
-const tagPart = move.tag ? `${move.tag} · ` : '';
-vTag.textContent = `${tagPart}${move.reps}`;
+const DEFAULT_WORK_SECONDS = { warmup:30, main:40, finisher:30 };
+function workSecondsFor(move, blockKey){
+const explicit = parseWorkSeconds(move.reps);
+return explicit > 0 ? explicit : (DEFAULT_WORK_SECONDS[blockKey] || 30);
+}
+function exerciseInfoHtml(ex, move){
 const difDots = "●".repeat(ex.dificultad) + "○".repeat(5-ex.dificultad);
 const kindLabel = ex.kind === "calistenia" ? "Calistenia (peso corporal)" : "Kettlebell";
 const metaLine = `${kindLabel} · Patrón: ${ex.patron} · Dificultad ${difDots} · ${ex.unilateral==="Si" ? "Unilateral" : ex.unilateral==="Ambos" ? "Uni o bilateral" : "Bilateral"}${ex.twoKB ? " · requiere 2 kettlebells" : ""}`;
 const descPart = ex.desc ? `<br><br><b>Cómo se hace:</b> ${ex.desc}` : '';
 const cuePart = ex.cue ? `<br><br><b>Evita:</b> ${ex.cue}` : '';
-vNote.innerHTML = `${metaLine}${descPart}${cuePart}`;
-stopTimer();
-currentMoveRest = move.rest || 60;
-currentWorkSeconds = parseWorkSeconds(move.reps);
-currentRoundNow = 1;
-currentRoundTotal = move.sets || 1;
-if (currentWorkSeconds > 0){
-timerPhase = "ready-work";
-phaseTotal = currentWorkSeconds;
-dialPhase.textContent = "LISTO — PULSA PARA TRABAJAR";
-} else {
-timerPhase = "ready-rest";
-phaseTotal = currentMoveRest;
-dialPhase.textContent = "LISTO — HAZ TU SERIE";
+return `${metaLine}${descPart}${cuePart}`;
 }
-secondsLeft = phaseTotal;
-updateDial();
+function previewMove(blockKey, index){
+const days = buildDays(currentWeek);
+const day = days[currentDayKey];
+const move = day[blockKey].moves[index];
+const ex = EXERCISES[move.ex];
+currentMoveRef = { blockKey, moveIndex:index };
+vName.textContent = ex.name;
+const tagPart = move.tag ? `${move.tag} · ` : '';
+vTag.textContent = `${tagPart}${move.reps}`;
+vNote.innerHTML = exerciseInfoHtml(ex, move);
 renderBlocks(day);
+if (!sessionActive){
+dialPhase.textContent = "VISTA PREVIA";
+phaseTotal = workSecondsFor(move, blockKey);
+secondsLeft = phaseTotal;
+roundTrack.innerHTML = `${move.sets || 1} serie(s) · ${move.rest || 0}s descanso · pulsa "Iniciar entrenamiento" para empezar la sesión guiada`;
+dialFill.style.strokeDasharray = CIRC;
+dialFill.style.strokeDashoffset = 0;
+dialTime.textContent = phaseTotal;
+dialTime.classList.remove('dial-urgent');
+}
 }
 function updateDial(){
 dialTime.textContent = secondsLeft;
-let roundHint;
-if (timerPhase === "work"){
-roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — trabajando (${phaseTotal}s)`;
-} else if (timerPhase === "rest"){
-roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — descansando (${phaseTotal}s)`;
-} else if (timerPhase === "ready-work"){
-roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — pulsa "Iniciar" para contar los ${phaseTotal}s de trabajo`;
-} else {
-roundHint = `Serie <b>${currentRoundNow}</b> / ${currentRoundTotal} — haz la serie y pulsa "Iniciar descanso"`;
-}
-roundTrack.innerHTML = roundHint;
 const fraction = phaseTotal > 0 ? secondsLeft / phaseTotal : 0;
 dialFill.style.strokeDasharray = CIRC;
 dialFill.style.strokeDashoffset = CIRC * (1 - fraction);
@@ -1228,92 +1221,161 @@ function transitionBeep(){
 tone(880, 0.4, 0.16);
 if (navigator.vibrate) navigator.vibrate(200);
 }
-function advanceToNextMove(){
-transitionBeep();
+const BLOCK_TRANSITION_REST = 20;
+function buildSessionQueue(day){
+const queue = [];
+const order = ["warmup","main","finisher"];
+order.forEach((blockKey, bi)=>{
+const block = day[blockKey];
+const moves = block.moves;
+if (blockKey === "main"){
+moves.forEach((m, mi)=>{
+const sets = m.sets || 1;
+for (let s=1; s<=sets; s++){
+queue.push({ kind:"work", blockKey, moveIndex:mi, seconds: workSecondsFor(m, blockKey), roundNow:s, roundTotal:sets });
+if (s < sets){
+queue.push({ kind:"rest", blockKey, moveIndex:mi, seconds: m.rest || 30, roundNow:s, roundTotal:sets, label:"Descanso entre series" });
+}
+}
+});
+} else {
+const roundsCount = moves.length ? (moves[0].sets || 1) : 1;
+const roundRest = moves.length ? (moves[0].rest || 30) : 30;
+for (let r=1; r<=roundsCount; r++){
+moves.forEach((m, mi)=>{
+queue.push({ kind:"work", blockKey, moveIndex:mi, seconds: workSecondsFor(m, blockKey), roundNow:r, roundTotal:roundsCount });
+});
+if (r < roundsCount){
+queue.push({ kind:"rest", blockKey, moveIndex:null, seconds: roundRest, roundNow:r, roundTotal:roundsCount, label:"Descanso entre rondas del circuito" });
+}
+}
+}
+if (bi < order.length-1){
+queue.push({ kind:"rest", blockKey:null, moveIndex:null, seconds: BLOCK_TRANSITION_REST, transition:true, fromBlock:blockKey, toBlock:order[bi+1], label:"Cambio de bloque" });
+}
+});
+return queue;
+}
+let sessionQueue = [];
+let sessionIndex = -1;
+let sessionActive = false;
+function blockTitle(blockKey){
+return blockKey === "warmup" ? "Calentamiento" : blockKey === "main" ? "Secuencia principal" : blockKey === "finisher" ? "Finalizador" : "";
+}
+function loadSessionStep(i){
 const days = buildDays(currentWeek);
 const day = days[currentDayKey];
-const flat = getFlatMoves(day);
-const curIdx = flat.findIndex(f=>f.blockKey===currentMoveRef.blockKey && f.index===currentMoveRef.moveIndex);
-if (curIdx === -1 || curIdx === flat.length-1){
-stopTimer();
-dialPhase.textContent = "¡DÍA COMPLETO!";
+const step = sessionQueue[i];
+phaseTotal = step.seconds;
+secondsLeft = step.seconds;
+if (step.kind === "work"){
+const move = day[step.blockKey].moves[step.moveIndex];
+const ex = EXERCISES[move.ex];
+currentMoveRef = { blockKey: step.blockKey, moveIndex: step.moveIndex };
+vName.textContent = ex.name;
+const tagPart = move.tag ? `${move.tag} · ` : '';
+vTag.textContent = `${tagPart}${move.reps}`;
+vNote.innerHTML = exerciseInfoHtml(ex, move);
+dialPhase.textContent = `TRABAJO — ${blockTitle(step.blockKey)}`;
+roundTrack.innerHTML = `Ronda/serie <b>${step.roundNow}</b> / ${step.roundTotal} — ${ex.name}`;
+renderBlocks(day);
+} else {
+currentMoveRef = step.moveIndex !== null ? { blockKey: step.blockKey, moveIndex: step.moveIndex } : null;
+vName.textContent = step.transition ? "Cambio de bloque" : "Descanso";
+vTag.textContent = step.transition ? `${blockTitle(step.fromBlock)} → ${blockTitle(step.toBlock)}` : blockTitle(step.blockKey);
+vNote.innerHTML = step.transition
+? `Prepárate: sigue <b>${blockTitle(step.toBlock)}</b>. Aprovecha para tener listo el equipo que necesites.`
+: `${step.label || "Descanso"} antes de continuar.`;
+dialPhase.textContent = "DESCANSO";
+roundTrack.innerHTML = step.transition ? "Transición entre bloques" : `Ronda/serie <b>${step.roundNow}</b> / ${step.roundTotal} — descansando`;
+renderBlocks(day);
+}
 updateDial();
+}
+function startWorkoutSession(){
+sessionQueue = buildSessionQueue(buildDays(currentWeek)[currentDayKey]);
+sessionIndex = 0;
+sessionActive = true;
+if (sessionQueue.length === 0) return;
+loadSessionStep(0);
+running = true;
+playBtn.textContent = "Pausar";
+startBtn.style.display = "none";
+skipBtn.style.display = "";
+stopSessionBtn.style.display = "";
+timerHandle = setInterval(tick, 1000);
+}
+function endSession(completed){
+running = false;
+sessionActive = false;
+clearInterval(timerHandle);
+startBtn.style.display = "";
+startBtn.textContent = "▶ Iniciar entrenamiento";
+skipBtn.style.display = "none";
+stopSessionBtn.style.display = "none";
+playBtn.textContent = "Pausar";
+if (completed){
+dialPhase.textContent = "¡ENTRENAMIENTO COMPLETO!";
+roundTrack.innerHTML = "Día marcado como completado";
 markCurrentDayComplete();
+} else {
+dialPhase.textContent = "SESIÓN DETENIDA";
+roundTrack.innerHTML = "Pulsa \"Iniciar entrenamiento\" cuando quieras retomar desde el principio del día";
+}
+}
+function advanceSession(){
+transitionBeep();
+sessionIndex++;
+if (sessionIndex >= sessionQueue.length){
+endSession(true);
 return;
 }
-const next = flat[curIdx+1];
-selectMove(next.blockKey, next.index);
-if (timerPhase === "ready-work"){
-startTimer();
-}
+loadSessionStep(sessionIndex);
 }
 function tick(){
+if (!sessionActive) return;
 secondsLeft--;
 if (secondsLeft >= 1 && secondsLeft <= 5){
 tickBeep();
 }
 if (secondsLeft < 0){
-if (timerPhase === "work"){
-transitionBeep();
-timerPhase = "rest";
-phaseTotal = currentMoveRest;
-secondsLeft = phaseTotal;
-dialPhase.textContent = "DESCANSO";
-updateDial();
+advanceSession();
 return;
 }
-currentRoundNow++;
-if (currentRoundNow > currentRoundTotal){
-advanceToNextMove();
-return;
-}
-transitionBeep();
-if (currentWorkSeconds > 0){
-timerPhase = "work";
-phaseTotal = currentWorkSeconds;
-dialPhase.textContent = "TRABAJO";
-} else {
-stopTimer();
-timerPhase = "ready-rest";
-phaseTotal = currentMoveRest;
-dialPhase.textContent = "LISTO — HAZ TU SERIE";
-}
-secondsLeft = phaseTotal;
-}
 updateDial();
 }
-function startTimer(){
-if (running) return;
-running = true;
-playBtn.textContent = "Pausar";
-if (timerPhase === "ready-work") timerPhase = "work";
-else if (timerPhase === "ready-rest") timerPhase = "rest";
-dialPhase.textContent = timerPhase === "work" ? "TRABAJO" : "DESCANSO";
-timerHandle = setInterval(tick, 1000);
-updateDial();
-}
-function stopTimer(){
+function pauseSession(){
 running = false;
-playBtn.textContent = currentWorkSeconds > 0 ? "Iniciar" : "Iniciar descanso";
+playBtn.textContent = "Reanudar";
 clearInterval(timerHandle);
 }
-function resetTimer(){
-stopTimer();
-currentRoundNow = 1;
-if (currentWorkSeconds > 0){
-timerPhase = "ready-work";
-phaseTotal = currentWorkSeconds;
-dialPhase.textContent = "LISTO — PULSA PARA TRABAJAR";
-} else {
-timerPhase = "ready-rest";
-phaseTotal = currentMoveRest;
-dialPhase.textContent = "LISTO — HAZ TU SERIE";
+function resumeSession(){
+if (!sessionActive || running) return;
+running = true;
+playBtn.textContent = "Pausar";
+timerHandle = setInterval(tick, 1000);
 }
-secondsLeft = phaseTotal;
-updateDial();
+function skipSessionStep(){
+if (!sessionActive) return;
+advanceSession();
 }
-playBtn.addEventListener('click', ()=>{ running ? stopTimer() : startTimer(); });
-resetBtn.addEventListener('click', resetTimer);
+playBtn.addEventListener('click', ()=>{
+if (!sessionActive) return;
+running ? pauseSession() : resumeSession();
+});
+startBtn.addEventListener('click', startWorkoutSession);
+skipBtn.addEventListener('click', skipSessionStep);
+stopSessionBtn.addEventListener('click', ()=> endSession(false));
+resetBtn.addEventListener('click', ()=>{
+if (sessionActive){
+sessionIndex = 0;
+loadSessionStep(0);
+running = true;
+playBtn.textContent = "Pausar";
+clearInterval(timerHandle);
+timerHandle = setInterval(tick, 1000);
+}
+});
 function renderStaticSections(){
 const wBody = document.getElementById('weightsBody');
 wBody.innerHTML = SUGGESTED_WEIGHTS.map(r=>
@@ -1325,10 +1387,21 @@ gGrid.innerHTML = GENERAL_WARMUP.map(g=>
 ).join('');
 }
 renderStaticSections();
+function silentStopSession(){
+running = false;
+sessionActive = false;
+clearInterval(timerHandle);
+startBtn.style.display = "";
+startBtn.textContent = "▶ Iniciar entrenamiento";
+skipBtn.style.display = "none";
+stopSessionBtn.style.display = "none";
+playBtn.textContent = "Pausar";
+}
 function refreshAll(){
+if (sessionActive) silentStopSession();
 const days = buildDays(currentWeek);
 const level = levelForWeek(currentWeek);
-document.getElementById('blockNotice').innerHTML = `<b>Semana ${currentWeek} · Nivel ${level}</b> — Días 1-3: ejercicios tal cual los definió Norman para esta semana (varían día a día y semana a semana, sin repetir). Día 4 y Día 5 (opcional, desde semana 5): mismos movimientos de la biblioteca, rotando por semana. Cada finalizador combina al menos un ejercicio de kettlebell y uno de calistenia.`;
+document.getElementById('blockNotice').innerHTML = `<b>Semana ${currentWeek} · Nivel ${level}</b> — Días 1-3: ejercicios tal cual los definió Norman para esta semana (varían día a día y semana a semana, sin repetir). Día 4 y Día 5 (opcional, desde semana 5): mismos movimientos de la biblioteca, rotando por semana. Cada finalizador combina al menos un ejercicio de kettlebell y uno de calistenia. Pulsa "Iniciar entrenamiento" para la sesión guiada con contadores de trabajo y descanso.`;
 renderWeekStrip();
 renderDayTabs(days);
 renderBlocks(days[currentDayKey]);
@@ -1336,11 +1409,7 @@ updateStreakUI();
 const done = isDayComplete(currentWeek, currentDayKey);
 doneBtn.textContent = done ? "✓ Día completado" : "✓ Marcar día completo";
 doneBtn.classList.toggle('done', done);
-if (!currentMoveRef){
-selectMove("warmup", 0);
-} else {
-selectMove(currentMoveRef.blockKey, currentMoveRef.moveIndex);
-}
+previewMove("warmup", 0);
 }
 refreshAll();
 </script>
