@@ -1013,6 +1013,46 @@ function setsCap(slug){
 const p = REP_PROFILE[slug];
 return (p && p.maxSets) || 6;
 }
+const WARM_FOR = {
+sentadilla: ["sentadillas_bw","goblet_squat","cossack_squat","step_up"],
+bisagra:    ["deadlift_una_pierna","hip_thrust","deadlift_kb"],
+empuje:     ["halo","plancha","windmill"],
+traccion:   ["halo","deadlift_una_pierna","plancha"],
+carga:      ["halo","goblet_squat","deadlift_una_pierna"],
+core:       ["halo","plancha","iron_trident"],
+movilidad:  ["halo","deadlift_una_pierna"],
+otro:       ["halo"]
+};
+const WARM_LABEL = {
+sentadilla:"tren inferior", bisagra:"cadena posterior", empuje:"hombros y empuje",
+traccion:"espalda y tracción", carga:"agarre y core", core:"core y estabilidad", movilidad:"movilidad", otro:"general"
+};
+function rebuildWarmupFromMain(day, w){
+const count = {}; const order = [];
+day.main.moves.forEach(m=>{
+const ex = EXERCISES[m.ex]; if (!ex) return;
+const k = patronKey(ex.patron);
+if (!(k in count)){ count[k] = 0; order.push(k); }
+count[k]++;
+});
+if (!order.length) return;
+const keys = order.slice().sort((a,b)=> count[b] - count[a] || order.indexOf(a) - order.indexOf(b));
+const used = new Set(day.main.moves.map(m=>m.ex));
+day.warmup.moves.forEach((m, i)=>{
+const k = keys[i % keys.length];
+const pool = WARM_FOR[k] || WARM_FOR.otro;
+let choice = null;
+for (let st = 0; st < pool.length; st++){
+const c = pool[(w - 1 + i + st) % pool.length];
+if (!used.has(c)){ choice = c; break; }
+}
+if (!choice) choice = pool[(w - 1 + i) % pool.length];
+used.add(choice);
+m.ex = choice;
+m.reps = repsFor(choice, "warmup", w);
+m.tag = "Activación — " + WARM_LABEL[k];
+});
+}
 function patronKey(p){
 const s = (p || "").toLowerCase();
 if (s.indexOf("bisagra") >= 0) return "bisagra";
@@ -1106,6 +1146,7 @@ moves:[
 }
 }
 };
+Object.keys(days).forEach(dk=>rebuildWarmupFromMain(days[dk], w));
 // Los ejercicios de estos días salen de rotar la biblioteca, así que sus repeticiones se calculan
 // por ejercicio (no por casilla): un Turkish get-up nunca queda en x20 ni un clean en "x30 seg".
 Object.keys(days).forEach(dk=>{
@@ -1144,6 +1185,7 @@ if (m.ex !== before) m.reps = repsFor(m.ex, bk, w);
 });
 });
 day.main.moves.forEach(m=>{ m.sets = Math.min(m.sets + setsBump, Math.max(m.sets, setsCap(m.ex))); });
+rebuildWarmupFromMain(day, w);
 });
 }
 const allDays = Object.assign(coreDays, buildExtraDays(w));
