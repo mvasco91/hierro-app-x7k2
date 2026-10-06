@@ -433,6 +433,10 @@ function pick(poolName, week, offset){
 const pool = POOLS[poolName];
 return pool[((week-1)+(offset||0)) % pool.length];
 }
+function pickFor(poolName, week, offset, blockKey){
+const pool = POOLS[poolName].filter(sl => !EXERCISES[sl] || EXERCISES[sl].kind === "calistenia" || !!blockRange(sl, blockKey));
+return pool[((week-1)+(offset||0)) % pool.length];
+}
 function calReps(slug){ return CAL_REPS[slug] || "x12"; }
 const GENERAL_WARMUP = [
 { name:"Neck Circles", reps:"10 reps", note:"Movimiento suave" },
@@ -945,6 +949,70 @@ day[bk].moves.forEach(m=>{ m.rest = scaleRest(m.rest, factor, floor); });
 });
 return days;
 }
+const REP_PROFILE = {
+turkish_getup:       { t:"s", warm:[1,3],  main:[3,5],  fin:[1,2],   maxSets:5 },
+windmill:            { t:"s", warm:[3,6],  main:[4,6],  fin:null,    maxSets:4 },
+halo:                { t:"r", warm:[5,10], main:null,   fin:null },
+deadlift_una_pierna: { t:"s", warm:[5,8],  main:[6,10], fin:null },
+iron_trident:        { t:"s", warm:[4,8],  main:[4,8],  fin:null,    maxSets:4 },
+russian_twist:       { t:"r", warm:[10,16],main:[12,20],fin:[20,24] },
+plancha:             { t:"t", warm:[20,45],main:[30,60],fin:[60,90] },
+goblet_squat:        { t:"r", warm:[8,15], main:[8,15], fin:[10,15] },
+sentadillas_bw:      { t:"r", warm:[10,20],main:null,   fin:null },
+bulgarian_squat:     { t:"s", warm:[5,8],  main:[6,10], fin:null },
+cossack_squat:       { t:"s", warm:[5,10], main:[6,10], fin:null },
+lunge_estatica:      { t:"s", warm:[8,10], main:[8,12], fin:null },
+lunge_intercalada:   { t:"s", warm:[8,12], main:[10,12],fin:[10,12] },
+step_up:             { t:"s", warm:[8,12], main:[8,12], fin:[10,12] },
+deadlift_kb:         { t:"r", warm:[10,12],main:[8,15], fin:[10,15] },
+hip_thrust:          { t:"r", warm:[10,15],main:[10,15],fin:[12,15] },
+swing_dos_manos:     { t:"r", warm:[10,15],main:[15,25],fin:[15,20], amrap:true },
+swing_una_mano:      { t:"s", warm:[8,10], main:[10,15],fin:[10,15], amrap:true },
+figure_8:            { t:"s", warm:[8,10], main:[10,15],fin:[10,15], amrap:true },
+clean:               { t:"s", warm:null,   main:[5,10], fin:[8,10] },
+snatch:              { t:"s", warm:null,   main:[5,10], fin:[8,10],  amrap:true },
+press:               { t:"s", warm:null,   main:[5,10], fin:null },
+push_press:          { t:"s", warm:null,   main:[5,10], fin:[8,10] },
+press_jerk:          { t:"s", warm:null,   main:[5,8],  fin:null },
+thruster:            { t:"r", warm:null,   main:[6,12], fin:[8,15],  amrap:true },
+floor_press:         { t:"s", warm:null,   main:[8,10], fin:null },
+bench_press:         { t:"r", warm:null,   main:[8,12], fin:null },
+remo_una_mano:       { t:"s", warm:null,   main:[8,12], fin:null },
+remo_dos_manos:      { t:"r", warm:null,   main:[8,12], fin:null },
+renegade_row:        { t:"s", warm:null,   main:[5,10], fin:null },
+gorilla_row:         { t:"r", warm:null,   main:[8,16], fin:[12,16] },
+pullover:            { t:"r", warm:null,   main:[8,12], fin:null },
+tiron_alto:          { t:"s", warm:null,   main:[8,12], fin:[10,12], amrap:true },
+farmer_walk:         { t:"f", warm:"25 metros (ida y vuelta)", main:"20 pasos por lado", fin:"40 metros por lado" },
+};
+function blockRange(slug, blockKey){
+const p = REP_PROFILE[slug];
+if (!p) return undefined;
+return blockKey === "warmup" ? p.warm : blockKey === "main" ? p.main : p.fin;
+}
+function repsFor(slug, blockKey, week){
+const ex = EXERCISES[slug];
+if (ex && ex.kind === "calistenia") return calReps(slug);
+const p = REP_PROFILE[slug];
+if (!p) return "x10";
+const r = blockRange(slug, blockKey);
+if (r === null || r === undefined) return "x8";
+if (p.t === "f") return r;
+const prog = Math.min(1, Math.max(0, (week - 1) / 11));
+let n = r[0] + prog * (r[1] - r[0]);
+// números "redondos": segundos de 5 en 5; repeticiones altas (>12) de 5 en 5; el resto, enteros
+if (p.t === "t") n = Math.round(n / 5) * 5;
+else if (r[1] > 12) n = Math.round(n / 5) * 5;
+else n = Math.round(n);
+n = Math.min(r[1], Math.max(r[0], n));
+if (p.t === "s") return `x${n}/${n}`;
+if (p.t === "t") return `x${n} segundos`;
+return `x${n}`;
+}
+function setsCap(slug){
+const p = REP_PROFILE[slug];
+return (p && p.maxSets) || 6;
+}
 function patronKey(p){
 const s = (p || "").toLowerCase();
 if (s.indexOf("bisagra") >= 0) return "bisagra";
@@ -964,10 +1032,11 @@ const key = patronKey(ex.patron);
 const bucket = ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL;
 (bucket[key] = bucket[key] || []).push(slug);
 });
-function varyExerciseForCiclo2(origSlug, cicloOffset, usedInDay){
+function varyExerciseForCiclo2(origSlug, cicloOffset, usedInDay, blockKey){
 const ex = EXERCISES[origSlug];
 if (!ex) return origSlug;
-const fullPool = (ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL)[patronKey(ex.patron)] || [];
+const suits = (s) => ex.kind === "calistenia" || !blockKey || !!blockRange(s, blockKey);
+const fullPool = ((ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL)[patronKey(ex.patron)] || []).filter(s => s === origSlug || suits(s));
 if (fullPool.length <= 1) return origSlug;
 const sameUni = fullPool.filter(s => EXERCISES[s].unilateral === ex.unilateral);
 const harder = (list) => list
@@ -992,28 +1061,28 @@ return origSlug;
 }
 function buildExtraDays(weekNum){
 const w = weekNum;
-return {
+const days = {
 day4: {
 label:"Día 4", meta:"Fuerza funcional — tracción + empuje + carga",
 warmup:{
 title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex: pick("core", w, 2), reps:"x5/5", sets:2, rest:30, tag:"Activación" },
-{ ex: pick("movilidad", w, 1), reps:"x10", sets:2, rest:30, tag:"Movilidad" },
+{ ex: pickFor("core", w, 2, "warmup"), reps:"x5/5", sets:2, rest:30, tag:"Activación" },
+{ ex: pickFor("movilidad", w, 1, "warmup"), reps:"x10", sets:2, rest:30, tag:"Movilidad" },
 ]
 },
 main:{
 title:"Secuencia principal", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
-{ ex: pick("traccion_d4", w, 0), reps:"x10/10", sets:4, rest:60, tag:"Fuerza — tracción · alternando" },
-{ ex: pick("empuje_d4", w, 0),   reps:"x8/8", sets:4, rest:60, tag:"Fuerza — empuje · alternando" },
-{ ex: pick("carga", w, 0),       reps:"x30 seg", sets:4, rest:45, tag:"Fuerza — carga/potencia" },
+{ ex: pickFor("traccion_d4", w, 0, "main"), reps:"x10/10", sets:4, rest:60, tag:"Fuerza — tracción · alternando" },
+{ ex: pickFor("empuje_d4", w, 0, "main"),   reps:"x8/8", sets:4, rest:60, tag:"Fuerza — empuje · alternando" },
+{ ex: pickFor("carga", w, 0, "main"),       reps:"x30 seg", sets:4, rest:45, tag:"Fuerza — carga/potencia" },
 ]
 },
 finisher:{
 title:"Finalizador", meta:"Circuito kettlebell + calistenia — una serie de cada uno por ronda",
 moves:[
-{ ex: pick("bisagra", w, 2), reps:"AMRAP", sets:2, rest:30, tag:"Kettlebell" },
+{ ex: pickFor("bisagra", w, 2, "finisher"), reps:"AMRAP", sets:2, rest:30, tag:"Kettlebell" },
 { ex: pick("calistenia", w, 5), reps: calReps(pick("calistenia", w, 5)), sets:2, rest:30, tag:"Calistenia" },
 ]
 }
@@ -1023,13 +1092,13 @@ label:"Día 5", meta:"Opcional — movilidad y core (desde semana 5)", optional:
 warmup:{
 title:"Calentamiento", meta:"Circuito — una serie de cada ejercicio por ronda",
 moves:[
-{ ex: pick("movilidad", w, 0), reps:"x10", sets:2, rest:30, tag:"Movilidad" },
+{ ex: pickFor("movilidad", w, 0, "warmup"), reps:"x10", sets:2, rest:30, tag:"Movilidad" },
 ]
 },
 main:{
 title:"Secuencia principal (ligera)", meta:"Series rectas — completa todas las series de un ejercicio antes de pasar al siguiente",
 moves:[
-{ ex: pick("core_d5", w, 0), reps:"x12", sets:3, rest:45, tag:"Core / estabilidad" },
+{ ex: pickFor("core_d5", w, 0, "main"), reps:"x12", sets:3, rest:45, tag:"Core / estabilidad" },
 { ex:"farmer_walk", reps:"20 pasos por lado", sets:3, rest:45, tag:"Carga ligera" },
 ]
 },
@@ -1042,6 +1111,19 @@ moves:[
 }
 }
 };
+// Los ejercicios de estos días salen de rotar la biblioteca, así que sus repeticiones se calculan
+// por ejercicio (no por casilla): un Turkish get-up nunca queda en x20 ni un clean en "x30 seg".
+Object.keys(days).forEach(dk=>{
+["warmup","main","finisher"].forEach(bk=>{
+days[dk][bk].moves.forEach(m=>{
+const prof = REP_PROFILE[m.ex];
+const isAmrapOk = prof && prof.amrap;
+if (m.reps === "AMRAP" && isAmrapOk) return;
+m.reps = repsFor(m.ex, bk, w);
+});
+});
+});
+return days;
 }
 function buildDays(weekNum){
 const w = weekNum;
@@ -1059,11 +1141,14 @@ day.meta = day.meta + " · Ciclo 2 (Avanzado)";
 const usedInDay = new Set();
 ["warmup","main","finisher"].forEach(bk=>{
 day[bk].moves.forEach(m=>{
-m.ex = varyExerciseForCiclo2(m.ex, cicloOffset, usedInDay);
+const before = m.ex;
+m.ex = varyExerciseForCiclo2(m.ex, cicloOffset, usedInDay, bk);
 usedInDay.add(m.ex);
+// Al cambiar de ejercicio, las repeticiones también cambian: cada uno tiene su propio rango
+if (m.ex !== before) m.reps = repsFor(m.ex, bk, w);
 });
 });
-day.main.moves.forEach(m=>{ m.sets = m.sets + setsBump; });
+day.main.moves.forEach(m=>{ m.sets = Math.min(m.sets + setsBump, Math.max(m.sets, setsCap(m.ex))); });
 });
 }
 const allDays = Object.assign(coreDays, buildExtraDays(w));
