@@ -1035,28 +1035,23 @@ const bucket = ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL;
 function varyExerciseForCiclo2(origSlug, cicloOffset, usedInDay, blockKey){
 const ex = EXERCISES[origSlug];
 if (!ex) return origSlug;
-const suits = (s) => ex.kind === "calistenia" || !blockKey || !!blockRange(s, blockKey);
-const fullPool = ((ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL)[patronKey(ex.patron)] || []).filter(s => s === origSlug || suits(s));
-if (fullPool.length <= 1) return origSlug;
-const sameUni = fullPool.filter(s => EXERCISES[s].unilateral === ex.unilateral);
-const harder = (list) => list
-.filter(s => s !== origSlug && !usedInDay.has(s) && EXERCISES[s].dificultad >= ex.dificultad)
-.sort((a,b)=> EXERCISES[a].dificultad - EXERCISES[b].dificultad);
-const rotate = (list) => {
-const baseIdx = Math.max(0, list.indexOf(origSlug));
-for (let step = 0; step < list.length; step++){
-const candidate = list[(baseIdx + cicloOffset + step) % list.length];
-if (candidate !== origSlug && !usedInDay.has(candidate)) return candidate;
+const suits = (sl) => ex.kind === "calistenia" || !blockKey || !!blockRange(sl, blockKey);
+const pool = ((ex.kind === "calistenia" ? CAL_PATTERN_POOL : KB_PATTERN_POOL)[patronKey(ex.patron)] || [])
+.filter(sl => sl !== origSlug && !usedInDay.has(sl) && suits(sl));
+const diff = (sl) => Math.abs(EXERCISES[sl].dificultad - ex.dificultad);
+const sameUni = (sl) => EXERCISES[sl].unilateral === ex.unilateral;
+// Misma línea y dificultad que Norman: mismo patrón y tipo, dificultad igual (o ±1 como máximo) y,
+// si se puede, misma lateralidad. Si no hay un reemplazo así se conserva el ejercicio original;
+// la progresión del Ciclo 2 viene de series, descanso y repeticiones, no de saltar de nivel.
+const tiers = [
+pool.filter(sl => sameUni(sl) && diff(sl) === 0),
+pool.filter(sl => sameUni(sl) && diff(sl) === 1),
+pool.filter(sl => diff(sl) === 0),
+pool.filter(sl => diff(sl) === 1),
+];
+for (const t of tiers){
+if (t.length) return t[(cicloOffset - 1) % t.length];
 }
-return null;
-};
-// Prioridad: 1) misma lateralidad + igual o más difícil, 2) cualquier lateralidad + igual o
-// más difícil (para no bajar la exigencia solo por mantener el patrón unilateral/bilateral
-// exacto), 3) misma lateralidad sin importar dificultad, 4) cualquiera del mismo patrón.
-const h1 = harder(sameUni); if (h1.length) return h1[(cicloOffset - 1) % h1.length];
-const h2 = harder(fullPool); if (h2.length) return h2[(cicloOffset - 1) % h2.length];
-const r1 = rotate(sameUni); if (r1) return r1;
-const r2 = rotate(fullPool); if (r2) return r2;
 return origSlug;
 }
 function buildExtraDays(weekNum){
