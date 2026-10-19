@@ -286,6 +286,14 @@ bench_press: { name:"Kettlebell Bench Press", patron:"Empuje", unilateral:"Ambos
 plancha: { name:"Plank", patron:"Core", unilateral:"No", dificultad:1, twoKB:false, desc:"Sostener la posición de plancha con el core activo, formando una línea recta de cabeza a talones.", cue:"Mantén la cadera alineada con hombros y tobillos, sin dejarla caer ni elevarla en exceso." },
 sentadillas_bw: { name:"Bodyweight Squat", patron:"Sentadilla", unilateral:"No", dificultad:1, twoKB:false, desc:"Sentadilla con el propio peso corporal para activar la cadena inferior antes de cargar kettlebell.", cue:"Activación general antes de cargar peso: baja controlado, rodillas siguiendo la línea de los pies." },
 iron_trident: { name:"Kettlebell Iron Trident", patron:"Core", unilateral:"No", dificultad:4, twoKB:false, kind:"kb", desc:"Trabaja el core atacando la anti-rotación, la anti-flexión lateral y la anti-flexión frontal de manera simultánea. Aprieta los glúteos, el abdomen y mantén firme la pesa rusa durante todo el recorrido.", cue:"Controla el movimiento sin dejar que la kettlebell te desestabilice en ningun eje; evita rotar la cadera o perder la contraccion abdominal." },
+snatch_press: { name:"Kettlebell Snatch & Press", patron:"Jalon", unilateral:"Si", dificultad:5, twoKB:false, kind:"kb", desc:"Snatch seguido de press: lleva la kettlebell desde el suelo hasta arriba con la fuerza de cadera y piernas, bloquea el brazo arriba, baja al rack y empuja de nuevo la pesa hacia el techo antes de bajarla. Se hacen todas las repeticiones de un lado y luego del otro.", cue:"Jalar con el brazo en vez de usar la cadera, no bloquear el codo arriba, arquear la espalda baja al empujar." },
+overhead_carry: { name:"Overhead Carry (Waiter Walk)", patron:"Carga", unilateral:"Si", dificultad:3, twoKB:false, kind:"kb", desc:"Con la kettlebell sostenida arriba con el brazo extendido y la muñeca neutra, camina 20 yardas ida y vuelta con el core firme y las costillas abajo.", cue:"Arquear la espalda baja, dejar caer el codo o inclinarse hacia el lado contrario a la pesa." },
+double_rack_carry: { name:"Double Rack Carry", patron:"Carga", unilateral:"No", dificultad:3, twoKB:true, kind:"kb", desc:"Dos kettlebells en posición de rack (apoyadas en el antebrazo y el pecho), codos pegados al torso; camina 20 yardas ida y vuelta con postura alta y respiración controlada.", cue:"Dejar caer los codos, encorvar el torso hacia adelante o dar pasos demasiado largos." },
+kb_chain_day2: { name:"Kettlebell Chain (Clean & Press · Snatch · Back Lunge · Half-Kneeling Press · Front Squat)", patron:"Carga", unilateral:"Si", dificultad:5, twoKB:false, kind:"kb", desc:"Cadena sin soltar la kettlebell, x1 de cada movimiento: clean & press a un lado, snatch, back lunge con la kettlebell arriba, half-kneeling press, ponerse de pie con la kettlebell arriba y front squat; repite del otro lado. Son 5 cadenas.", cue:"Soltar la pesa entre movimientos, perder la kettlebell arriba en el lunge o apurar las transiciones." },
+double_clean: { name:"Double Kettlebell Clean", patron:"Carga", unilateral:"No", dificultad:4, twoKB:true, kind:"kb", desc:"Dos kettlebells: clean simultáneo desde el suelo hasta el rack con extensión explosiva de cadera.", cue:"Jalar con los brazos, golpear el antebrazo con la pesa o no extender completamente la cadera." },
+double_press: { name:"Double Kettlebell Press", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:true, kind:"kb", desc:"Desde el rack con dos kettlebells, empuja ambas arriba hasta extender los codos, sin arquear la espalda baja.", cue:"Arquear la zona lumbar, abrir los codos o empujar con las rodillas." },
+double_front_squat: { name:"Double Kettlebell Front Squat", patron:"Sentadilla", unilateral:"No", dificultad:4, twoKB:true, kind:"kb", desc:"Dos kettlebells en rack: sentadilla frontal profunda con el torso erguido y los codos pegados al cuerpo.", cue:"Dejar caer el pecho, despegar los talones o colapsar las rodillas hacia adentro." },
+double_push_press: { name:"Double Kettlebell Push Press", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:true, kind:"kb", desc:"Desde el rack con dos kettlebells: ligero dip de rodillas y extensión de piernas para impulsar ambas pesas hasta arriba.", cue:"Empujar antes de extender las piernas o flexionar de más al hacer el dip." },
 cal_flexiones_de_pecho: { name:"Push-ups", patron:"Empuje", unilateral:"No", dificultad:2, twoKB:false, kind:"calistenia", desc:"Empuje horizontal en suelo manteniendo el cuerpo alineado y codos a 45 grados.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
 cal_flexiones_inclinadas: { name:"Incline Push-ups", patron:"Empuje", unilateral:"No", dificultad:1, twoKB:false, kind:"calistenia", desc:"Manos en superficie elevada reduciendo la resistencia para dominar el patrón de empuje.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
 cal_flexiones_declinadas: { name:"Decline Push-ups", patron:"Empuje", unilateral:"No", dificultad:3, twoKB:false, kind:"calistenia", desc:"Pies sobre superficie elevada aumentando la carga sobre hombros y pecho superior.", cue:"Prioriza la tecnica sobre la velocidad; reduce el rango o las repeticiones si pierdes la forma." },
@@ -457,7 +465,7 @@ const SUGGESTED_WEIGHTS = [
 { nivel:"Avanzado",     genero:"Mujer",  peso:"16 a 20 kg", nota:"Puede subir a 20kg si domina la técnica" },
 { nivel:"Avanzado",     genero:"Hombre", peso:"20 a 24 kg", nota:"Puede subir a 28kg si domina la técnica" },
 ];
-const WEEK_PROGRAM = {
+const EXCEL_WEEK_PROGRAM = {
 1: {
 day1: {
 label:"Día 1", meta:"Resistencia — cadena posterior + Fuerza — cadena inferior + Fuerza — cadena posterior",
@@ -920,6 +928,65 @@ moves:[
 }
 },
 };
+const PDF_SETS_D12  = [4,5,6,4,5,6,4,5,6,4,5,6];
+const PDF_REST_D12  = [60,60,60,50,50,50,40,40,40,30,30,30];
+const PDF_SETS_D3   = [4,4,5,5,6,6,4,5,5,4,6,6];
+const PDF_REST_D3   = [90,90,90,90,90,90,90,75,75,75,75,75];
+const PDF_PER_MIN   = [10,11,12,13,14,10,15,16,17,18,10,20];
+const PDF_ROUNDS_D2 = [3,3,3,3,4,4,4,4,3,3,5,5];
+function emomReps(w){ return `x${PDF_PER_MIN[w-1]} por minuto — alterna de mano cada minuto`; }
+function pdfWeek(w){
+const i = w - 1;
+const sD12 = PDF_SETS_D12[i], rD12 = PDF_REST_D12[i];
+const sD3 = PDF_SETS_D3[i], rD3 = PDF_REST_D3[i];
+const rounds2 = PDF_ROUNDS_D2[i];
+return {
+day1: {
+label:"Día 1", meta:"Snatch & Press + Goblet Squat — finalizador de swings a una mano",
+warmup:{ title:"Calentamiento", meta:"5 min de movilidad antes · Circuito ×3 series (PDF)", moves:[
+{ ex:"deadlift_una_pierna", reps:"x5/5", sets:3, rest:30, tag:"Calentamiento" },
+{ ex:"halo", reps:"x5 por dirección", sets:3, rest:30, tag:"Calentamiento" },
+{ ex:"overhead_carry", reps:"20 yardas ida y vuelta", sets:3, rest:30, tag:"Calentamiento", secs:40, fixed:true } ] },
+main:{ title:"Secuencia principal", meta:`Cada serie = toda la secuencia en orden · ${sD12} series · descanso ${rD12} s`, circuit:true,
+note:"Una serie es toda la secuencia: Snatch & Press derecho, izquierdo y Goblet Squat; luego descanso y repites las series indicadas.", moves:[
+{ ex:"snatch_press", reps:"x5 lado derecho", sets:sD12, rest:rD12, tag:"Fuerza — snatch & press", secs:40, fixed:true },
+{ ex:"snatch_press", reps:"x5 lado izquierdo", sets:sD12, rest:rD12, tag:"Fuerza — snatch & press", secs:40, fixed:true },
+{ ex:"goblet_squat", reps:"x10", sets:sD12, rest:rD12, tag:"Fuerza — cadena inferior", secs:35 } ] },
+finisher:{ title:"Finalizador", meta:"10 minutos EMOM — swings a una mano", note:"Cada minuto haces las repeticiones indicadas y descansas lo que sobre del minuto; cambia de mano en cada minuto.", moves:[
+{ ex:"swing_una_mano", reps:emomReps(w), sets:10, rest:0, tag:"EMOM — 10 minutos", secs:60, fixed:true, emom:true } ] }
+},
+day2: {
+label:"Día 2", meta:"Cadena de kettlebell — finalizador swings + Turkish get-up",
+warmup:{ title:"Calentamiento", meta:"5 min de movilidad antes · Circuito ×3 series (PDF)", moves:[
+{ ex:"turkish_getup", reps:"x1/1", sets:3, rest:30, tag:"Calentamiento", secs:45 },
+{ ex:"double_rack_carry", reps:"20 yardas ida y vuelta", sets:3, rest:30, tag:"Calentamiento", secs:40, fixed:true } ] },
+main:{ title:"Secuencia principal", meta:`Cadena sin soltar la kettlebell · ${sD12} series · descanso ${rD12} s`, circuit:true,
+note:"Cada serie son 5 cadenas por lado (clean & press, snatch, back lunge con la pesa arriba, half-kneeling press, ponerse de pie, front squat) sin soltar la kettlebell; luego descanso.", moves:[
+{ ex:"kb_chain_day2", reps:"x5 cadenas por lado (cada movimiento x1)", sets:sD12, rest:rD12, tag:"Fuerza — complejo", secs:150, fixed:true } ] },
+finisher:{ title:"Finalizador", meta:`${rounds2} rondas = ${rounds2*4} minutos`, note:"Cada ronda son 4 minutos: swings derecha, Turkish get-up derecha, swings izquierda, Turkish get-up izquierda (1 minuto cada uno).", moves:[
+{ ex:"swing_una_mano", reps:"x10 mano derecha (1 min)", sets:rounds2, rest:0, tag:"Finalizador", secs:60, fixed:true },
+{ ex:"turkish_getup", reps:"x1 lado derecho (1 min)", sets:rounds2, rest:0, tag:"Finalizador", secs:60, fixed:true },
+{ ex:"swing_una_mano", reps:"x10 mano izquierda (1 min)", sets:rounds2, rest:0, tag:"Finalizador", secs:60, fixed:true },
+{ ex:"turkish_getup", reps:"x1 lado izquierdo (1 min)", sets:rounds2, rest:0, tag:"Finalizador", secs:60, fixed:true } ] }
+},
+day3: {
+label:"Día 3", meta:"Complejo doble kettlebell — todo con una kettlebell un tamaño menor",
+warmup:{ title:"Calentamiento", meta:"5 min de movilidad antes · Circuito ×3 series (PDF)", moves:[
+{ ex:"goblet_squat", reps:"x5 con pausa abajo (3 a 5 s)", sets:3, rest:30, tag:"Calentamiento", secs:40 },
+{ ex:"halo", reps:"x5 por dirección", sets:3, rest:30, tag:"Calentamiento" } ] },
+main:{ title:"Secuencia principal", meta:`Complejo doble kettlebell · ${sD3} series · descanso ${rD3} s`, circuit:true,
+note:"Cada serie: clean, press, front squat y push press con dos kettlebells (x5 cada uno) sin soltarlas; luego descanso.", moves:[
+{ ex:"double_clean", reps:"x5", sets:sD3, rest:rD3, tag:"Fuerza — doble kettlebell", secs:30, fixed:true },
+{ ex:"double_press", reps:"x5", sets:sD3, rest:rD3, tag:"Fuerza — doble kettlebell", secs:30, fixed:true },
+{ ex:"double_front_squat", reps:"x5", sets:sD3, rest:rD3, tag:"Fuerza — doble kettlebell", secs:30, fixed:true },
+{ ex:"double_push_press", reps:"x5", sets:sD3, rest:rD3, tag:"Fuerza — doble kettlebell", secs:30, fixed:true } ] },
+finisher:{ title:"Finalizador", meta:"10 minutos EMOM — snatches", note:"Cada minuto haces las repeticiones indicadas y descansas lo que sobre del minuto; cambia de mano en cada minuto.", moves:[
+{ ex:"snatch", reps:emomReps(w), sets:10, rest:0, tag:"EMOM — 10 minutos", secs:60, fixed:true, emom:true } ] }
+}
+};
+}
+const WEEK_PROGRAM = {};
+for (let w = 1; w <= 6; w++) WEEK_PROGRAM[w] = pdfWeek(w);
 function levelForWeek(w){
 if (w < 3) return "Principiante";
 if (w < 6) return "Intermedio";
@@ -941,10 +1008,11 @@ const factor = restFactorForWeek(w);
 if (factor === 1) return days;
 Object.keys(days).forEach(dk=>{
 const day = days[dk];
+if (w <= 6 && /^day[123]$/.test(dk)) return; // semanas 1-6 de los días 1-3: tal cual el PDF
 ["warmup","main","finisher"].forEach(bk=>{
 if (!day[bk] || !day[bk].moves) return;
 const floor = bk === "main" ? 25 : 15;
-day[bk].moves.forEach(m=>{ m.rest = scaleRest(m.rest, factor, floor); });
+day[bk].moves.forEach(m=>{ if (m.rest > 0) m.rest = scaleRest(m.rest, factor, floor); });
 });
 });
 return days;
@@ -1021,7 +1089,7 @@ traccion:   ["halo","deadlift_una_pierna","plancha"],
 carga:      ["halo","goblet_squat","deadlift_una_pierna"],
 core:       ["halo","plancha","iron_trident"],
 movilidad:  ["halo","deadlift_una_pierna"],
-otro:       ["halo"]
+otro:       ["halo","deadlift_una_pierna","goblet_squat"]
 };
 const WARM_LABEL = {
 sentadilla:"tren inferior", bisagra:"cadena posterior", empuje:"hombros y empuje",
@@ -1177,6 +1245,7 @@ day.meta = day.meta + " · Ciclo 2 (Avanzado)";
 const usedInDay = new Set();
 ["warmup","main","finisher"].forEach(bk=>{
 day[bk].moves.forEach(m=>{
+if (m.fixed){ usedInDay.add(m.ex); if (m.emom) m.reps = emomReps(w); return; }
 const before = m.ex;
 m.ex = varyExerciseForCiclo2(m.ex, cicloOffset, usedInDay, bk);
 usedInDay.add(m.ex);
@@ -1292,7 +1361,8 @@ if (currentDayKey === "day5" && currentWeek < 5){
 currentDayKey = "day1";
 }
 }
-function blockExecNote(blockKey){
+function blockExecNote(blockKey, block){
+if (block && block.note) return block.note;
 if (blockKey === "main"){
 return "Series rectas: cada ejercicio se hace entero (todas sus series, con descanso entre ellas) antes de pasar al siguiente.";
 }
@@ -1320,7 +1390,7 @@ div.innerHTML = `
 <div class="block-title">${block.title}</div>
 <div class="block-meta">${block.meta}</div>
 <div class="move-list">${movesHtml}</div>
-<div class="block-note">${blockExecNote(blockKey)}</div>
+<div class="block-note">${blockExecNote(blockKey, block)}</div>
 `;
 blocksContainer.appendChild(div);
 });
@@ -1343,6 +1413,7 @@ return 0;
 }
 const DEFAULT_WORK_SECONDS = { warmup:30, main:40, finisher:30 };
 function workSecondsFor(move, blockKey){
+if (move.secs) return move.secs;
 const explicit = parseWorkSeconds(move.reps);
 return explicit > 0 ? explicit : (DEFAULT_WORK_SECONDS[blockKey] || 30);
 }
@@ -1425,7 +1496,7 @@ const order = ["warmup","main","finisher"];
 order.forEach((blockKey, bi)=>{
 const block = day[blockKey];
 const moves = block.moves;
-if (blockKey === "main"){
+if (blockKey === "main" && !block.circuit){
 moves.forEach((m, mi)=>{
 const sets = m.sets || 1;
 for (let s=1; s<=sets; s++){
@@ -1437,12 +1508,12 @@ queue.push({ kind:"rest", blockKey, moveIndex:mi, seconds: m.rest || 30, roundNo
 });
 } else {
 const roundsCount = moves.length ? (moves[0].sets || 1) : 1;
-const roundRest = moves.length ? (moves[0].rest || 30) : 30;
+const roundRest = moves.length ? (moves[0].rest === undefined || moves[0].rest === null ? 30 : moves[0].rest) : 30;
 for (let r=1; r<=roundsCount; r++){
 moves.forEach((m, mi)=>{
 queue.push({ kind:"work", blockKey, moveIndex:mi, seconds: workSecondsFor(m, blockKey), roundNow:r, roundTotal:roundsCount });
 });
-if (r < roundsCount){
+if (r < roundsCount && roundRest > 0){
 queue.push({ kind:"rest", blockKey, moveIndex:null, seconds: roundRest, roundNow:r, roundTotal:roundsCount, label:"Descanso entre rondas del circuito" });
 }
 }
